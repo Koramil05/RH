@@ -460,22 +460,22 @@
       <b>📌 DATA ANAK</b>
       <table id="anakTable">\(
         <th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th>
-         </tr>
-       </table>
+          </tr>
+        </table>
       <button onclick="tambahAnak()">+ Tambah Anak</button><br><br>
 
       <b>📌 RIWAYAT PANGKAT</b>
       <table id="pangkatTable">\(
         <th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th>
-         </tr>
-       </table>
+          </tr>
+        </table>
       <button onclick="tambahPangkat()">+ Tambah Pangkat</button><br><br>
 
       <b>📌 RIWAYAT JABATAN</b>
       <table id="jabatanTable">\(
         <th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th>
-         </tr>
-       </table>
+          </tr>
+        </table>
       <button onclick="tambahJabatan()">+ Tambah Jabatan</button>
 
       <div class="action-buttons">
@@ -492,7 +492,6 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvIWu8k4HzezEZ8l-Co4UlOvD1efhruDnJz7Zl-hBYBDDIsrb-sViey4Y7joeAjRKRiA/exec";
 
 // ========== STORAGE KEY ==========
-const STORAGE_KEY = "personil_data_" + window.location.hostname;
 const CHECKED_NRPS_KEY = "checked_nrps";
 
 // ========== FUNGSI GLOBAL ==========
@@ -512,11 +511,10 @@ async function checkNRPExists(nrp) {
   if (checkSpan) checkSpan.innerHTML = '🔄';
   if (pangkatCheckSpan) pangkatCheckSpan.innerHTML = '🔄';
   
-  // Cek di cache lokal dulu
   const localCache = localStorage.getItem(CHECKED_NRPS_KEY);
   const cached = localCache ? JSON.parse(localCache) : {};
   
-  if (cached[nrp]) {
+  if (cached[nrp] !== undefined) {
     nrpExists = cached[nrp];
     updateCheckStatus(nrpExists, checkSpan, pangkatCheckSpan);
     return nrpExists;
@@ -533,7 +531,6 @@ async function checkNRPExists(nrp) {
     const data = await response.json();
     nrpExists = !data.error;
     
-    // Simpan ke cache
     cached[nrp] = nrpExists;
     localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(cached));
     
@@ -551,18 +548,17 @@ function updateCheckStatus(exists, checkSpan, pangkatCheckSpan) {
     if (exists) {
       checkSpan.innerHTML = '⚠️';
       checkSpan.className = 'check-status status-exists';
-      checkSpan.title = 'NRP sudah terdaftar';
+      checkSpan.title = 'NRP sudah terdaftar - data akan diganti/update';
     } else {
       checkSpan.innerHTML = '✓';
       checkSpan.className = 'check-status status-available';
-      checkSpan.title = 'NRP tersedia';
+      checkSpan.title = 'NRP tersedia - data baru akan dibuat';
     }
   }
   if (pangkatCheckSpan) {
     if (exists) {
       pangkatCheckSpan.innerHTML = '⚠️';
       pangkatCheckSpan.className = 'check-status status-exists';
-      pangkatCheckSpan.title = 'NRP sudah terdaftar';
     } else {
       pangkatCheckSpan.innerHTML = '';
     }
@@ -570,10 +566,10 @@ function updateCheckStatus(exists, checkSpan, pangkatCheckSpan) {
   
   const nrpInfo = document.getElementById('nrpInfo');
   if (nrpInfo && exists) {
-    nrpInfo.innerHTML = '⚠️ NRP ini sudah terdaftar. Jika melanjutkan, data yang ada akan diperbarui.';
+    nrpInfo.innerHTML = '⚠️ NRP sudah terdaftar. Data akan DIGANTI dengan yang baru.';
     nrpInfo.style.color = '#f59e0b';
   } else if (nrpInfo) {
-    nrpInfo.innerHTML = '✓ NRP tersedia. Data baru akan dibuat.';
+    nrpInfo.innerHTML = '✓ NRP tersedia. Data BARU akan dibuat.';
     nrpInfo.style.color = '#10b981';
   }
 }
@@ -608,7 +604,6 @@ document.getElementById('nrpInput').addEventListener('input', function(e) {
   }
 });
 
-// Cek NRP dari field pangkat
 document.getElementById('pangkat').addEventListener('input', function(e) {
   clearTimeout(nrpCheckTimeout);
   const pangkat = e.target.value;
@@ -755,19 +750,19 @@ function tambahAnak() {
   let t = document.getElementById('anakTable');
   let row = t.insertRow();
   let no = t.rows.length-1;
-  row.innerHTML = `  <td>${no}</td>  <td><input placeholder="Nama anak"></td>  <td><input placeholder="Kota, DD-MM-YYYY"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Nama anak"></td>    <td><input placeholder="Kota, DD-MM-YYYY"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
 }
 function tambahPangkat() {
   let t = document.getElementById('pangkatTable');
   let row = t.insertRow();
   let no = t.rows.length-1;
-  row.innerHTML = `  <td>${no}</td>  <td><input placeholder="Pangkat"></td>  <td><input placeholder="No SK"></td>  <td><input placeholder="DD-MM-YYYY"></td>  <td><input placeholder="TMT"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Pangkat"></td>    <td><input placeholder="No SK"></td>    <td><input placeholder="DD-MM-YYYY"></td>    <td><input placeholder="TMT"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
 }
 function tambahJabatan() {
   let t = document.getElementById('jabatanTable');
   let row = t.insertRow();
   let no = t.rows.length-1;
-  row.innerHTML = `  <td>${no}</td>  <td><input placeholder="Jabatan"></td>  <td><input placeholder="No SK"></td>  <td><input placeholder="DD-MM-YYYY"></td>  <td><input placeholder="TMT"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Jabatan"></td>    <td><input placeholder="No SK"></td>    <td><input placeholder="DD-MM-YYYY"></td>    <td><input placeholder="TMT"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
 }
 function hapusBaris(btn) {
   if (confirm("Hapus data ini?")) {
@@ -878,15 +873,15 @@ function isiFormDenganData(data) {
   document.getElementById('nikah').value = data.nikah || '';
   hitungUmur();
 
-  document.getElementById('anakTable').innerHTML = '  <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th></tr> ';
-  document.getElementById('pangkatTable').innerHTML = '  <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> ';
-  document.getElementById('jabatanTable').innerHTML = '  <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> ';
+  document.getElementById('anakTable').innerHTML = '    <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th></tr>';
+  document.getElementById('pangkatTable').innerHTML = '    <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr>';
+  document.getElementById('jabatanTable').innerHTML = '    <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr>';
 
   if (data.anak && data.anak.length) {
     data.anak.forEach((an, idx) => {
       let t = document.getElementById('anakTable');
       let row = t.insertRow();
-      row.innerHTML = `  <td>${idx+1}</td>  <td><input value="${escapeHtml(an[0])}"></td>  <td><input value="${escapeHtml(an[1])}"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(an[0])}"></td>    <td><input value="${escapeHtml(an[1])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahAnak(); }
   
@@ -894,7 +889,7 @@ function isiFormDenganData(data) {
     data.pangkat_list.forEach((p, idx) => {
       let t = document.getElementById('pangkatTable');
       let row = t.insertRow();
-      row.innerHTML = `  <td>${idx+1}</td>  <td><input value="${escapeHtml(p[0])}"></td>  <td><input value="${escapeHtml(p[1])}"></td>  <td><input value="${escapeHtml(p[2])}"></td>  <td><input value="${escapeHtml(p[3])}"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(p[0])}"></td>    <td><input value="${escapeHtml(p[1])}"></td>    <td><input value="${escapeHtml(p[2])}"></td>    <td><input value="${escapeHtml(p[3])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahPangkat(); }
   
@@ -902,7 +897,7 @@ function isiFormDenganData(data) {
     data.jabatan_list.forEach((j, idx) => {
       let t = document.getElementById('jabatanTable');
       let row = t.insertRow();
-      row.innerHTML = `  <td>${idx+1}</td>  <td><input value="${escapeHtml(j[0])}"></td>  <td><input value="${escapeHtml(j[1])}"></td>  <td><input value="${escapeHtml(j[2])}"></td>  <td><input value="${escapeHtml(j[3])}"></td>  <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(j[0])}"></td>    <td><input value="${escapeHtml(j[1])}"></td>    <td><input value="${escapeHtml(j[2])}"></td>    <td><input value="${escapeHtml(j[3])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahJabatan(); }
 }
@@ -925,6 +920,21 @@ async function simpanData() {
   if (nrpFromPangkat && nrpFromPangkat !== currentNRP) {
     const konfirmasi = confirm(`Perhatian! NRP dalam pangkat (${nrpFromPangkat}) berbeda dengan NRP login (${currentNRP}).\n\nApakah Anda yakin ingin menyimpan dengan NRP yang berbeda?`);
     if (!konfirmasi) return;
+    currentNRP = nrpFromPangkat;
+  }
+  
+  // Tentukan apakah ini update atau create berdasarkan cek NRP
+  let isUpdate = false;
+  if (isOnline) {
+    try {
+      const checkResponse = await fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentNRP)}`);
+      const checkData = await checkResponse.json();
+      isUpdate = !checkData.error;
+    } catch(e) {
+      isUpdate = false;
+    }
+  } else {
+    isUpdate = nrpExists;
   }
   
   const payload = {
@@ -943,10 +953,11 @@ async function simpanData() {
     jabatan_list: ambilDataTable('jabatanTable')
   };
   
-  showLoading('Menyimpan data...');
+  showLoading(isUpdate ? 'Mengganti data...' : 'Menyimpan data baru...');
   const simpanBtn = document.getElementById('simpanBtn');
   simpanBtn.disabled = true;
   
+  // Simpan ke cache lokal
   const offlineKey = "personil_cache_" + currentNRP;
   localStorage.setItem(offlineKey, JSON.stringify(payload));
   
@@ -968,13 +979,27 @@ async function simpanData() {
     clearPendingSave();
     hideLoading();
     simpanBtn.disabled = false;
-    alert("✅ Data berhasil disimpan!");
+    
+    if (isUpdate) {
+      alert("✅ Data berhasil DIGANTI/UPDATE!");
+    } else {
+      alert("✅ Data berhasil DISIMPAN sebagai data baru!");
+    }
     
     // Update cache NRP
     const cached = localStorage.getItem(CHECKED_NRPS_KEY);
     const nrpCache = cached ? JSON.parse(cached) : {};
     nrpCache[currentNRP] = true;
     localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(nrpCache));
+    nrpExists = true;
+    
+    // Update status info
+    const nrpInfo = document.getElementById('nrpInfo');
+    if (nrpInfo) {
+      nrpInfo.innerHTML = '✅ Data telah tersimpan. Perubahan selanjutnya akan mengganti data yang sama.';
+      nrpInfo.style.color = '#10b981';
+    }
+    
   } catch(e) {
     saveToLocalStorage(payload);
     hideLoading();
@@ -1011,6 +1036,7 @@ function cetakForm() {
 // ========== LOGOUT ==========
 function logout() {
   currentNRP = null;
+  nrpExists = false;
   document.getElementById('loginPanel').style.display = 'block';
   document.getElementById('dataPanel').classList.remove('active');
   document.getElementById('nrpInput').value = '';
@@ -1023,9 +1049,9 @@ function logout() {
   document.getElementById('ttl_istri').value = '';
   document.getElementById('nikah').value = '';
   document.getElementById('umur').innerText = '0 th 0 bl 0 hr';
-  document.getElementById('anakTable').innerHTML = '  <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th> \)';
-  document.getElementById('pangkatTable').innerHTML = '  <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
-  document.getElementById('jabatanTable').innerHTML = '  <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
+  document.getElementById('anakTable').innerHTML = '    <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th> \)';
+  document.getElementById('pangkatTable').innerHTML = '    <td><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
+  document.getElementById('jabatanTable').innerHTML = '    <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
   const checkSpan = document.getElementById('nrpCheckStatus');
   if (checkSpan) checkSpan.innerHTML = '';
   const nrpInfo = document.getElementById('nrpInfo');
