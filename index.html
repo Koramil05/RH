@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Data Personil</title>
+
+<style>
+body { font-family: Arial; margin:20px; }
+.container { max-width:800px; margin:auto; }
+
+/* KOP SESUAI SKRIP ANDA */
+.kop { margin-bottom: 10px; }
+
+.kop-text {
+    display: inline-block;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+    padding-bottom: 3px;
+    line-height: 1.3;
+}
+
+.kop-text div:first-child { font-size:14px; }
+.kop-text div:last-child { font-size:13px; }
+
+/* FORM */
+.row { display:flex; margin-bottom:5px; align-items: center; }
+.label { width:200px; }
+.value input { width:100%; }
+.umur-display { margin-left: 10px; font-weight: bold; color: #2c3e50; }
+
+/* TABLE */
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+table, th, td { border:1px solid black; }
+th, td { padding:5px; font-size:12px; text-align:center; }
+td input { width:90%; padding:3px; }
+
+button { margin:5px; padding:8px; }
+
+/* PRINT */
+@media print {
+    input, button, .umur-display { display:none; }
+    th:last-child, td:last-child { display: none; }
+    td { 
+        position: relative;
+        min-height: 20px;
+    }
+    td input { display: none; }
+    td:has(input)::before {
+        content: attr(data-value);
+        display: block;
+        padding: 2px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- KOP SESUAI SKRIP ANDA -->
+<div class="kop">
+    <div class="kop-text">
+        <div>KOMANDO RESOR MILITER 163/WIRA SATYA</div>
+        <div>KOMANDO DISTRIK MILITER 1609</div>
+    </div>
+</div>
+
+<br>
+
+<!-- DATA PERSONIL -->
+<div class="row">
+    <div class="label">Nama</div>
+    <div class="value"><input id="nama" placeholder="Nama lengkap"></div>
+</div>
+<div class="row">
+    <div class="label">Pangkat / NRP</div>
+    <div class="value"><input id="pangkat" placeholder="Contoh: Letda Inf / 119900123"></div>
+</div>
+<div class="row">
+    <div class="label">Jabatan</div>
+    <div class="value"><input id="jabatan" placeholder="Contoh: Danramil 01"></div>
+</div>
+<div class="row">
+    <div class="label">TTL</div>
+    <div class="value"><input id="ttl" placeholder="Kota, DD-MM-YYYY" onkeyup="hitungUmur()" onchange="hitungUmur()"></div>
+    <span class="umur-display" id="umur">0 tahun 0 bulan 0 hari</span>
+</div>
+<div class="row">
+    <div class="label">Alamat</div>
+    <div class="value"><input id="alamat" placeholder="Alamat lengkap"></div>
+</div>
+
+<br>
+
+<!-- DATA ISTRI -->
+<div class="row">
+    <div class="label">Nama Istri</div>
+    <div class="value"><input id="istri" placeholder="Nama lengkap istri"></div>
+</div>
+<div class="row">
+    <div class="label">TTL Istri</div>
+    <div class="value"><input id="ttl_istri" placeholder="Kota, DD-MM-YYYY"></div>
+</div>
+<div class="row">
+    <div class="label">Akta Nikah</div>
+    <div class="value"><input id="nikah" placeholder="Nomor akta nikah"></div>
+</div>
+
+<br>
+
+<!-- DATA ANAK -->
+<b>DATA ANAK</b>
+<table id="anakTable">
+<tr>
+    <th style="width:5%">No</th>
+    <th style="width:45%">Nama</th>
+    <th style="width:45%">TTL</th>
+    <th style="width:5%">Aksi</th>
+</tr>
+</table>
+<button onclick="tambahAnak()">+ Anak</button>
+
+<br><br>
+
+<!-- RIWAYAT PANGKAT -->
+<b>RIWAYAT PANGKAT</b>
+<table id="pangkatTable">
+<tr>
+    <th style="width:5%">No</th>
+    <th style="width:30%">Pangkat</th>
+    <th style="width:15%">No</th>
+    <th style="width:20%">Tgl</th>
+    <th style="width:20%">TMT</th>
+    <th style="width:5%">Aksi</th>
+</tr>
+</table>
+<button onclick="tambahPangkat()">+ Pangkat</button>
+
+<br><br>
+
+<!-- RIWAYAT JABATAN -->
+<b>RIWAYAT JABATAN</b>
+<table id="jabatanTable">
+<tr>
+    <th style="width:5%">No</th>
+    <th style="width:30%">Jabatan</th>
+    <th style="width:15%">No</th>
+    <th style="width:20%">Tgl</th>
+    <th style="width:20%">TMT</th>
+    <th style="width:5%">Aksi</th>
+</tr>
+</table>
+<button onclick="tambahJabatan()">+ Jabatan</button>
+
+<br><br>
+
+<!-- BUTTON ACTION -->
+<div style="text-align: center; margin-top: 20px;">
+    <button onclick="simpan()">💾 Simpan</button>
+    <button onclick="loadData()">📂 Load</button>
+    <button onclick="cetak()">🖨 Cetak</button>
+</div>
+
+</div>
+
+<script>
+// ================= KONFIGURASI =================
+const url = "ISI_URL_WEB_APP"; // GANTI DENGAN URL WEB APP ANDA
+
+// ================= FUNGSI HITUNG UMUR =================
+function hitungUmur() {
+    const ttlInput = document.getElementById('ttl').value;
+    const umurSpan = document.getElementById('umur');
+    
+    if (!ttlInput) {
+        umurSpan.innerText = '0 tahun 0 bulan 0 hari';
+        return;
+    }
+
+    // Parse tanggal lahir (format: Kota, DD-MM-YYYY)
+    const parts = ttlInput.split(',');
+    if (parts.length < 2) {
+        umurSpan.innerText = 'Format: Kota, DD-MM-YYYY';
+        return;
+    }
+
+    const dateParts = parts[1].trim().split('-');
+    if (dateParts.length !== 3) {
+        umurSpan.innerText = 'Gunakan format DD-MM-YYYY';
+        return;
+    }
+
+    const day = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const year = parseInt(dateParts[2]);
+
+    if (isNaN(day) || isNaN(month) || isNaN(year) || day < 1 || day > 31 || month < 0 || month > 11 || year < 1900 || year > 2100) {
+        umurSpan.innerText = 'Tanggal tidak valid';
+        return;
+    }
+
+    const today = new Date();
+    const birthDate = new Date(year, month, day);
+
+    if (birthDate > today) {
+        umurSpan.innerText = 'Tanggal lahir tidak valid';
+        return;
+    }
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+        months--;
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += lastMonth.getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    umurSpan.innerText = `${years} tahun ${months} bulan ${days} hari`;
+}
+
+// ================= FUNGSI TAMBAH DATA =================
+function tambahAnak() {
+    let t = document.getElementById('anakTable');
+    let row = t.insertRow();
+    let no = t.rows.length - 1;
+    row.innerHTML = `<td>${no}</td>
+    <td><input type="text" placeholder="Nama anak"></td>
+    <td><input type="text" placeholder="Kota, DD-MM-YYYY"></td>
+    <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+}
+
+function tambahPangkat() {
+    let t = document.getElementById('pangkatTable');
+    let row = t.insertRow();
+    let no = t.rows.length - 1;
+    row.innerHTML = `<td>${no}</td>
+    <td><input type="text" placeholder="Pangkat"></td>
+    <td><input type="text" placeholder="No. SK"></td>
+    <td><input type="text" placeholder="DD-MM-YYYY"></td>
+    <td><input type="text" placeholder="DD-MM-YYYY"></td>
+    <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+}
+
+function tambahJabatan() {
+    let t = document.getElementById('jabatanTable');
+    let row = t.insertRow();
+    let no = t.rows.length - 1;
+    row.innerHTML = `<td>${no}</td>
+    <td><input type="text" placeholder="Jabatan"></td>
+    <td><input type="text" placeholder="No. SK"></td>
+    <td><input type="text" placeholder="DD-MM-YYYY"></td>
+    <td><input type="text" placeholder="DD-MM-YYYY"></td>
+    <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+}
+
+// ================= FUNGSI HAPUS =================
+function hapus(btn) {
+    if (confirm('Yakin ingin menghapus data ini?')) {
+        let row = btn.parentElement.parentElement;
+        row.parentElement.removeChild(row);
+        updateNomor();
+    }
+}
+
+function updateNomor() {
+    const tables = ['anakTable', 'pangkatTable', 'jabatanTable'];
+    tables.forEach(tableId => {
+        let t = document.getElementById(tableId);
+        for (let i = 1; i < t.rows.length; i++) {
+            t.rows[i].cells[0].innerHTML = i;
+        }
+    });
+}
+
+// ================= FUNGSI AMBIL DATA =================
+function ambilDataTable(id) {
+    let t = document.getElementById(id);
+    let data = [];
+    for (let i = 1; i < t.rows.length; i++) {
+        let row = t.rows[i];
+        let rowData = [];
+        for (let j = 1; j < row.cells.length - 1; j++) {
+            let input = row.cells[j].querySelector('input');
+            rowData.push(input ? input.value : '');
+        }
+        data.push(rowData);
+    }
+    return data;
+}
+
+// ================= FUNGSI SIMPAN =================
+function simpan() {
+    if (!nama.value || !pangkat.value || !jabatan.value || !ttl.value) {
+        alert('Harap isi data wajib (Nama, Pangkat, Jabatan, TTL)!');
+        return;
+    }
+
+    const data = {
+        nama: nama.value,
+        pangkat: pangkat.value,
+        jabatan: jabatan.value,
+        ttl: ttl.value,
+        umur: document.getElementById('umur').innerText,
+        alamat: alamat.value,
+        istri: istri.value,
+        ttl_istri: ttl_istri.value,
+        umur_istri: hitungUmurDariString(ttl_istri.value),
+        nikah: nikah.value,
+        anak: ambilDataTable('anakTable'),
+        pangkat_list: ambilDataTable('pangkatTable'),
+        jabatan_list: ambilDataTable('jabatanTable')
+    };
+
+    if (confirm('Simpan data ke server?')) {
+        fetch(url, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert('Data berhasil disimpan!');
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+}
+
+// ================= FUNGSI LOAD =================
+function loadData() {
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        nama.value = data.nama || '';
+        pangkat.value = data.pangkat || '';
+        jabatan.value = data.jabatan || '';
+        ttl.value = data.ttl || '';
+        alamat.value = data.alamat || '';
+        istri.value = data.istri || '';
+        ttl_istri.value = data.ttl_istri || '';
+        nikah.value = data.nikah || '';
+        
+        // Load data anak
+        if (data.anak && data.anak.length > 0) {
+            document.getElementById('anakTable').innerHTML = '<tr><th style="width:5%">No</th><th style="width:45%">Nama</th><th style="width:45%">TTL</th><th style="width:5%">Aksi</th></tr>';
+            data.anak.forEach((item, index) => {
+                let t = document.getElementById('anakTable');
+                let row = t.insertRow();
+                row.innerHTML = `<td>${index + 1}</td>
+                <td><input value="${item[0] || ''}"></td>
+                <td><input value="${item[1] || ''}"></td>
+                <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+            });
+        }
+        
+        // Load data pangkat
+        if (data.pangkat_list && data.pangkat_list.length > 0) {
+            document.getElementById('pangkatTable').innerHTML = '<tr><th style="width:5%">No</th><th style="width:30%">Pangkat</th><th style="width:15%">No</th><th style="width:20%">Tgl</th><th style="width:20%">TMT</th><th style="width:5%">Aksi</th></tr>';
+            data.pangkat_list.forEach((item, index) => {
+                let t = document.getElementById('pangkatTable');
+                let row = t.insertRow();
+                row.innerHTML = `<td>${index + 1}</td>
+                <td><input value="${item[0] || ''}"></td>
+                <td><input value="${item[1] || ''}"></td>
+                <td><input value="${item[2] || ''}"></td>
+                <td><input value="${item[3] || ''}"></td>
+                <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+            });
+        }
+        
+        // Load data jabatan
+        if (data.jabatan_list && data.jabatan_list.length > 0) {
+            document.getElementById('jabatanTable').innerHTML = '<tr><th style="width:5%">No</th><th style="width:30%">Jabatan</th><th style="width:15%">No</th><th style="width:20%">Tgl</th><th style="width:20%">TMT</th><th style="width:5%">Aksi</th></tr>';
+            data.jabatan_list.forEach((item, index) => {
+                let t = document.getElementById('jabatanTable');
+                let row = t.insertRow();
+                row.innerHTML = `<td>${index + 1}</td>
+                <td><input value="${item[0] || ''}"></td>
+                <td><input value="${item[1] || ''}"></td>
+                <td><input value="${item[2] || ''}"></td>
+                <td><input value="${item[3] || ''}"></td>
+                <td><button onclick="hapus(this)" style="background-color:#e74c3c; color:white; padding:3px 8px;">X</button></td>`;
+            });
+        }
+        
+        hitungUmur();
+        alert('Data berhasil dimuat!');
+    })
+    .catch(error => {
+        alert('Gagal memuat data: ' + error.message);
+    });
+}
+
+// ================= FUNGSI CETAK =================
+function cetak() {
+    // Simpan nilai input ke attribute data-value
+    let tables = ['anakTable', 'pangkatTable', 'jabatanTable'];
+    
+    tables.forEach(tableId => {
+        let t = document.getElementById(tableId);
+        for (let i = 1; i < t.rows.length; i++) {
+            let row = t.rows[i];
+            for (let j = 1; j < row.cells.length - 1; j++) {
+                let input = row.cells[j].querySelector('input');
+                if (input) {
+                    row.cells[j].setAttribute('data-value', input.value || '-');
+                }
+            }
+        }
+    });
+    
+    window.print();
+}
+
+// ================= FUNGSI BANTUAN =================
+function hitungUmurDariString(ttlString) {
+    if (!ttlString) return "";
+    const match = ttlString.match(/\b(19|20)\d{2}\b/);
+    if (!match) return "";
+    const tahunLahir = parseInt(match[0]);
+    const tahunSekarang = new Date().getFullYear();
+    const umur = tahunSekarang - tahunLahir;
+    return umur >= 0 ? umur + " tahun" : "";
+}
+
+// ================= INITIALIZATION =================
+window.onload = function() {
+    // Tambah 1 baris default untuk setiap tabel
+    tambahAnak();
+    tambahPangkat();
+    tambahJabatan();
+    hitungUmur();
+};
+</script>
+
+</body>
+</html>
