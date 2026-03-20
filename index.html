@@ -469,7 +469,7 @@
       </div>
       <div class="row"><div class="label">Jabatan</div><div class="value"><input id="jabatan" placeholder="Danramil 01"></div></div>
       <div class="row">
-        <div class="label">TTL</div>
+        <div class="label">TTL Personel</div>
         <div class="value"><input id="ttl" placeholder="Kota, DD-MM-YYYY" onkeyup="hitungUmur()" onchange="hitungUmur()"></div>
         <span class="umur-display" id="umur">0 th 0 bl 0 hr</span>
       </div>
@@ -481,21 +481,21 @@
 
       <b>A. DATA ANAK</b>
       <table id="anakTable">
-        <thead><tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
       <button onclick="tambahAnak()">+ Tambah Anak</button><br><br>
 
       <b>B. RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
-        <thead><tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
       <button onclick="tambahPangkat()">+ Tambah Pangkat</button><br><br>
 
       <b>C. RIWAYAT JABATAN</b>
       <table id="jabatanTable">
-        <thead><tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
       <button onclick="tambahJabatan()">+ Tambah Jabatan</button>
@@ -773,7 +773,7 @@ function tambahPangkat() {
   let tbody = document.querySelector('#pangkatTable tbody');
   let row = tbody.insertRow();
   let no = tbody.rows.length;
-  row.innerHTML = `<td>${no}</td><td><input placeholder="Pangkat"></td><td><input placeholder="No SK"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
+  row.innerHTML = `<td>${no}</td><td><input placeholder="Pangkat"></td><td><input placeholder="Nomor Sprin/Skep"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
 }
 function tambahJabatan() {
   let tbody = document.querySelector('#jabatanTable tbody');
