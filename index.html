@@ -397,20 +397,21 @@
       <div class="login-title">🔐 Akses Data Personel</div>
       <div class="nrp-input-group">
         <div class="value" style="position: relative;">
-          <input type="text" id="nrpInput" placeholder="Masukkan NRP (cth: 119900123)" autocomplete="off" inputmode="numeric">
+          <input type="text" id="nrpInput" placeholder="Masukkan NRP Lengkap" autocomplete="off" inputmode="numeric">
           <span id="nrpCheckStatus" class="check-status"></span>
         </div>
         <button class="btn-login" id="loginBtn">MASUK</button>
       </div>
-      <div style="font-size: 13px; color: gray;">* Gunakan NRP yang terdaftar pada Pangkat/NRP</div>
+      <div style="font-size: 13px; color: gray;">* Masukan yang diberikan sangat berarti bagi kami dalam meningkatkan kualitas layanan dan fitur aplikasi.
+— Serka I Nyoman Arta (Admin & Developer)” </div>
       <div id="nrpInfo" style="font-size: 12px; margin-top: 10px;"></div>
     </div>
 
     <div id="dataPanel" class="form-section">
       <!-- Data utama -->
       <div class="row"><div class="label">Nama</div><div class="value"><input id="nama" placeholder="Nama lengkap"></div></div>
-      <div class="row"><div class="label">Pangkat / NRP</div><div class="value" style="position: relative;"><input id="pangkat" placeholder="Contoh: Letda Inf / 119900123"><span id="pangkatCheckStatus" class="check-status"></span></div></div>
-      <div class="row"><div class="label">Jabatan</div><div class="value"><input id="jabatan" placeholder="Danramil 01"></div></div>
+      <div class="row"><div class="label">Pangkat / NRP</div><div class="value" style="position: relative;"><input id="pangkat" placeholder="Kopda / 31020"><span id="pangkatCheckStatus" class="check-status"></span></div></div>
+      <div class="row"><div class="label">Jabatan</div><div class="value"><input id="jabatan" placeholder="Babinsa Ramil 1609-05/Desa. "></div></div>
       <div class="row"><div class="label">TTL Personel</div><div class="value"><input id="ttl" placeholder="Kota, DD-MM-YYYY" onkeyup="hitungUmur()" onchange="hitungUmur()"></div><span class="umur-display" id="umur">0 th 0 bl 0 hr</span></div>
       <div class="row"><div class="label">Alamat</div><div class="value"><input id="alamat"></div></div>
       <div style="height: 8px;"></div>
