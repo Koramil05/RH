@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>KORAMIL 1609-05/SUKASADA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Data Personil - Kodim 1609</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c7da0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Data Personil">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c7da0'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E📋%3C/text%3E%3C/svg%3E">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c7da0'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E📋%3C/text%3E%3C/svg%3E">
 
 <style>
   * {
@@ -13,7 +24,7 @@
   }
 
   body {
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: Arial, 'Segoe UI', Roboto, sans-serif;
     background: #e9ecef;
     min-height: 100vh;
     display: flex;
@@ -201,17 +212,13 @@
     flex: 1;
     position: relative;
   }
-  .value input, .value .static-text {
+  .value input {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 16px;
     font-size: 14px;
     background: #fff;
-  }
-  .value .static-text {
-    background: #f1f5f9;
-    color: #0f3b5c;
   }
   .umur-display {
     margin-left: 12px;
@@ -230,9 +237,6 @@
     transform: translateY(-50%);
     font-size: 18px;
   }
-  .status-checking-nrp {
-    color: #f59e0b;
-  }
   .status-exists {
     color: #ef4444;
   }
@@ -240,18 +244,28 @@
     color: #10b981;
   }
 
-  /* Tabel */
+  /* Tabel - KOLOM NO DIPERKECIL */
   table {
     width: 100%;
     border-collapse: collapse;
     margin: 12px 0;
     font-size: 12px;
+    table-layout: fixed;
   }
   th, td {
     border: 1px solid #b9c8e0;
     padding: 8px 4px;
     text-align: center;
     vertical-align: middle;
+    word-break: break-word;
+  }
+  /* Kolom No - lebar kecil */
+  th:first-child, td:first-child {
+    width: 40px;
+  }
+  /* Kolom Aksi - lebar kecil */
+  th:last-child, td:last-child {
+    width: 60px;
   }
   th {
     background: #eef2ff;
@@ -295,27 +309,38 @@
     background: #475569;
   }
 
-  /* CETAK */
+  /* CETAK - HITAM PUTIH, ARIAL */
   @media print {
-    .status-badge, .loading-overlay, .check-status {
-      display: none !important;
-    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      color: black !important;
+      background: white !important;
+      background-color: white !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
+    
     body {
+      font-family: Arial, Helvetica, sans-serif !important;
       background: white;
       padding: 0;
       margin: 0;
       display: block;
     }
+    
+    .status-badge, .loading-overlay, .check-status, button, 
+    .action-buttons, .btn-login, .login-area, .umur-display, #loginPanel {
+      display: none !important;
+    }
+    
     .app-container {
       max-width: 100%;
       margin: 0;
       padding: 0;
     }
+    
     .panel {
       background: white;
       border-radius: 0;
@@ -323,9 +348,11 @@
       padding: 0;
       margin: 0;
     }
+    
     .kop {
       margin-bottom: 10px;
     }
+    
     .kop-text {
       display: inline-block;
       text-align: center;
@@ -334,60 +361,63 @@
       padding-bottom: 3px;
       line-height: 1.3;
     }
-    .kop-text div:first-child { font-size: 14px; }
-    .kop-text div:last-child { font-size: 13px; }
-    button, .action-buttons, .btn-login, .login-area, .umur-display, #loginPanel {
-      display: none !important;
-    }
+    
     .form-section.active {
       display: block !important;
     }
+    
+    /* Kolom No dan Aksi tetap kecil saat cetak */
+    th:first-child, td:first-child {
+      width: 40px !important;
+    }
     th:last-child, td:last-child {
+      width: 60px !important;
       display: none !important;
     }
+    
     td input {
       display: none !important;
     }
+    
     td[data-value]::before {
       content: attr(data-value);
       display: block;
       text-align: center;
     }
+    
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 10px 0;
+      table-layout: fixed;
     }
+    
     th, td {
-      border: 1px solid black;
+      border: 1px solid black !important;
       padding: 8px 4px;
       text-align: center;
       vertical-align: middle;
     }
-    th {
-      background: #f0f0f0 !important;
-      font-weight: bold;
-    }
-    b {
-      display: block;
-      margin: 15px 0 5px 0;
-      font-size: 14px;
-    }
+    
     .row {
       display: flex;
       margin-bottom: 8px;
       page-break-inside: avoid;
     }
+    
     .label {
       width: 140px;
       font-weight: bold;
     }
+    
     .value {
       flex: 1;
     }
+    
     .value input {
       display: none;
     }
+    
     .value::before {
       content: attr(data-value);
       display: block;
@@ -413,8 +443,8 @@
     <!-- KOP -->
     <div class="kop">
       <div class="kop-text">
+        <div>KOMANDO RESOR MILITER 163/WIRA SATYA</div>
         <div>KOMANDO DISTRIK MILITER 1609</div>
-        <div>KORAMIL 1609-05/SUKASADA</div>
       </div>
     </div>
 
@@ -423,7 +453,7 @@
       <div class="login-title">🔐 Akses Data Personel</div>
       <div class="nrp-input-group">
         <div class="value" style="position: relative;">
-          <input type="text" id="nrpInput" placeholder="Masukkan NRP Lengkap" autocomplete="off" inputmode="numeric">
+          <input type="text" id="nrpInput" placeholder="Masukkan NRP (cth: 119900123)" autocomplete="off" inputmode="numeric">
           <span id="nrpCheckStatus" class="check-status"></span>
         </div>
         <button class="btn-login" id="loginBtn">MASUK</button>
@@ -445,9 +475,9 @@
           <span id="pangkatCheckStatus" class="check-status"></span>
         </div>
       </div>
-      <div class="row"><div class="label">Jabatan</div><div class="value"><input id="jabatan" placeholder="Babinsa Ramil 1609-05/Desa..."></div></div>
+      <div class="row"><div class="label">Jabatan</div><div class="value"><input id="jabatan" placeholder="Danramil 01"></div></div>
       <div class="row">
-        <div class="label">Tempat Tanggal Lahir</div>
+        <div class="label">TTL</div>
         <div class="value"><input id="ttl" placeholder="Kota, DD-MM-YYYY" onkeyup="hitungUmur()" onchange="hitungUmur()"></div>
         <span class="umur-display" id="umur">0 th 0 bl 0 hr</span>
       </div>
@@ -457,24 +487,27 @@
       <div class="row"><div class="label">TTL Istri</div><div class="value"><input id="ttl_istri"></div></div>
       <div class="row"><div class="label">Akta Nikah</div><div class="value"><input id="nikah"></div></div>
 
-      <b> DATA ANAK</b>
+      <b>📌 DATA ANAK</b>
       <table id="anakTable">
-        <th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th>
-          </tr>
+        <thead>
+          <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th> </thead>
+        <tbody></tbody>
         </table>
       <button onclick="tambahAnak()">+ Tambah Anak</button><br><br>
 
-      <b> RIWAYAT PANGKAT</b>
+      <b>📌 RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
-        <th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th>
-          </tr>
+        <thead>
+          <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> </thead>
+        <tbody></tbody>
         </table>
       <button onclick="tambahPangkat()">+ Tambah Pangkat</button><br><br>
 
-      <b> RIWAYAT JABATAN</b>
+      <b>📌 RIWAYAT JABATAN</b>
       <table id="jabatanTable">
-        <th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th>
-          </tr>
+        <thead>
+          <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> </thead>
+        <tbody></tbody>
         </table>
       <button onclick="tambahJabatan()">+ Tambah Jabatan</button>
 
@@ -732,10 +765,11 @@ function hitungUmurDariString(ttlStr) {
 }
 
 function ambilDataTable(tableId) {
-  let t = document.getElementById(tableId);
+  let tbody = document.querySelector(`#${tableId} tbody`);
+  if (!tbody) return [];
   let result = [];
-  for (let i = 1; i < t.rows.length; i++) {
-    let row = t.rows[i];
+  for (let i = 0; i < tbody.rows.length; i++) {
+    let row = tbody.rows[i];
     let rowData = [];
     for (let j = 1; j < row.cells.length - 1; j++) {
       let inp = row.cells[j].querySelector('input');
@@ -747,31 +781,50 @@ function ambilDataTable(tableId) {
 }
 
 function tambahAnak() {
-  let t = document.getElementById('anakTable');
-  let row = t.insertRow();
-  let no = t.rows.length-1;
-  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Nama anak"></td>    <td><input placeholder="Kota, DD-MM-YYYY"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  let tbody = document.querySelector('#anakTable tbody');
+  let row = tbody.insertRow();
+  let no = tbody.rows.length;
+  row.innerHTML = `
+     <td>${no}</td>
+     <td><input placeholder="Nama anak"></td>
+     <td><input placeholder="Kota, DD-MM-YYYY"></td>
+     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+  `;
 }
 function tambahPangkat() {
-  let t = document.getElementById('pangkatTable');
-  let row = t.insertRow();
-  let no = t.rows.length-1;
-  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Pangkat"></td>    <td><input placeholder="No SK"></td>    <td><input placeholder="DD-MM-YYYY"></td>    <td><input placeholder="TMT"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  let tbody = document.querySelector('#pangkatTable tbody');
+  let row = tbody.insertRow();
+  let no = tbody.rows.length;
+  row.innerHTML = `
+     <td>${no}</td>
+     <td><input placeholder="Pangkat"></td>
+     <td><input placeholder="No SK"></td>
+     <td><input placeholder="DD-MM-YYYY"></td>
+     <td><input placeholder="TMT"></td>
+     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+  `;
 }
 function tambahJabatan() {
-  let t = document.getElementById('jabatanTable');
-  let row = t.insertRow();
-  let no = t.rows.length-1;
-  row.innerHTML = `    <td>${no}</td>    <td><input placeholder="Jabatan"></td>    <td><input placeholder="No SK"></td>    <td><input placeholder="DD-MM-YYYY"></td>    <td><input placeholder="TMT"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td> `;
+  let tbody = document.querySelector('#jabatanTable tbody');
+  let row = tbody.insertRow();
+  let no = tbody.rows.length;
+  row.innerHTML = `
+     <td>${no}</td>
+     <td><input placeholder="Jabatan"></td>
+     <td><input placeholder="No SK"></td>
+     <td><input placeholder="DD-MM-YYYY"></td>
+     <td><input placeholder="TMT"></td>
+     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+  `;
 }
 function hapusBaris(btn) {
   if (confirm("Hapus data ini?")) {
-    btn.closest('tr').remove();
-    let tables = ['anakTable','pangkatTable','jabatanTable'];
-    tables.forEach(tid => {
-      let tbl = document.getElementById(tid);
-      for(let i=1;i<tbl.rows.length;i++) tbl.rows[i].cells[0].innerHTML = i;
-    });
+    let row = btn.closest('tr');
+    let tbody = row.parentNode;
+    row.remove();
+    for(let i = 0; i < tbody.rows.length; i++) {
+      tbody.rows[i].cells[0].innerHTML = i + 1;
+    }
   }
 }
 
@@ -873,31 +926,50 @@ function isiFormDenganData(data) {
   document.getElementById('nikah').value = data.nikah || '';
   hitungUmur();
 
-  document.getElementById('anakTable').innerHTML = '    <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th></tr>';
-  document.getElementById('pangkatTable').innerHTML = '    <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr>';
-  document.getElementById('jabatanTable').innerHTML = '    <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr>';
+  let anakTbody = document.querySelector('#anakTable tbody');
+  anakTbody.innerHTML = '';
+  let pangkatTbody = document.querySelector('#pangkatTable tbody');
+  pangkatTbody.innerHTML = '';
+  let jabatanTbody = document.querySelector('#jabatanTable tbody');
+  jabatanTbody.innerHTML = '';
 
   if (data.anak && data.anak.length) {
     data.anak.forEach((an, idx) => {
-      let t = document.getElementById('anakTable');
-      let row = t.insertRow();
-      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(an[0])}"></td>    <td><input value="${escapeHtml(an[1])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
+      let row = anakTbody.insertRow();
+      row.innerHTML = `
+         <td>${idx+1}</td>
+         <td><input value="${escapeHtml(an[0])}"></td>
+         <td><input value="${escapeHtml(an[1])}"></td>
+         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+      `;
     });
   } else { tambahAnak(); }
   
   if (data.pangkat_list && data.pangkat_list.length) {
     data.pangkat_list.forEach((p, idx) => {
-      let t = document.getElementById('pangkatTable');
-      let row = t.insertRow();
-      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(p[0])}"></td>    <td><input value="${escapeHtml(p[1])}"></td>    <td><input value="${escapeHtml(p[2])}"></td>    <td><input value="${escapeHtml(p[3])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
+      let row = pangkatTbody.insertRow();
+      row.innerHTML = `
+         <td>${idx+1}</td>
+         <td><input value="${escapeHtml(p[0])}"></td>
+         <td><input value="${escapeHtml(p[1])}"></td>
+         <td><input value="${escapeHtml(p[2])}"></td>
+         <td><input value="${escapeHtml(p[3])}"></td>
+         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+      `;
     });
   } else { tambahPangkat(); }
   
   if (data.jabatan_list && data.jabatan_list.length) {
     data.jabatan_list.forEach((j, idx) => {
-      let t = document.getElementById('jabatanTable');
-      let row = t.insertRow();
-      row.innerHTML = `    <td>${idx+1}</td>    <td><input value="${escapeHtml(j[0])}"></td>    <td><input value="${escapeHtml(j[1])}"></td>    <td><input value="${escapeHtml(j[2])}"></td>    <td><input value="${escapeHtml(j[3])}"></td>    <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
+      let row = jabatanTbody.insertRow();
+      row.innerHTML = `
+         <td>${idx+1}</td>
+         <td><input value="${escapeHtml(j[0])}"></td>
+         <td><input value="${escapeHtml(j[1])}"></td>
+         <td><input value="${escapeHtml(j[2])}"></td>
+         <td><input value="${escapeHtml(j[3])}"></td>
+         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
+      `;
     });
   } else { tambahJabatan(); }
 }
@@ -923,7 +995,6 @@ async function simpanData() {
     currentNRP = nrpFromPangkat;
   }
   
-  // Tentukan apakah ini update atau create berdasarkan cek NRP
   let isUpdate = false;
   if (isOnline) {
     try {
@@ -957,7 +1028,6 @@ async function simpanData() {
   const simpanBtn = document.getElementById('simpanBtn');
   simpanBtn.disabled = true;
   
-  // Simpan ke cache lokal
   const offlineKey = "personil_cache_" + currentNRP;
   localStorage.setItem(offlineKey, JSON.stringify(payload));
   
@@ -986,14 +1056,12 @@ async function simpanData() {
       alert("✅ Data berhasil DISIMPAN sebagai data baru!");
     }
     
-    // Update cache NRP
     const cached = localStorage.getItem(CHECKED_NRPS_KEY);
     const nrpCache = cached ? JSON.parse(cached) : {};
     nrpCache[currentNRP] = true;
     localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(nrpCache));
     nrpExists = true;
     
-    // Update status info
     const nrpInfo = document.getElementById('nrpInfo');
     if (nrpInfo) {
       nrpInfo.innerHTML = '✅ Data telah tersimpan. Perubahan selanjutnya akan mengganti data yang sama.';
@@ -1012,9 +1080,10 @@ async function simpanData() {
 function cetakForm() {
   let tables = ['anakTable','pangkatTable','jabatanTable'];
   tables.forEach(tid => {
-    let t = document.getElementById(tid);
-    for(let i=1;i<t.rows.length;i++) {
-      let cells = t.rows[i].cells;
+    let tbody = document.querySelector(`#${tid} tbody`);
+    if(!tbody) return;
+    for(let i=0;i<tbody.rows.length;i++) {
+      let cells = tbody.rows[i].cells;
       for(let j=1;j<cells.length-1;j++) {
         let inp = cells[j].querySelector('input');
         if(inp) cells[j].setAttribute('data-value', inp.value || '-');
@@ -1049,9 +1118,15 @@ function logout() {
   document.getElementById('ttl_istri').value = '';
   document.getElementById('nikah').value = '';
   document.getElementById('umur').innerText = '0 th 0 bl 0 hr';
-  document.getElementById('anakTable').innerHTML = '    <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th> \)';
-  document.getElementById('pangkatTable').innerHTML = '    <td><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
-  document.getElementById('jabatanTable').innerHTML = '    <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> \)';
+  
+  document.querySelector('#anakTable tbody').innerHTML = '';
+  document.querySelector('#pangkatTable tbody').innerHTML = '';
+  document.querySelector('#jabatanTable tbody').innerHTML = '';
+  
+  tambahAnak();
+  tambahPangkat();
+  tambahJabatan();
+  
   const checkSpan = document.getElementById('nrpCheckStatus');
   if (checkSpan) checkSpan.innerHTML = '';
   const nrpInfo = document.getElementById('nrpInfo');
@@ -1076,7 +1151,19 @@ document.getElementById('nrpInput').addEventListener('keypress', function(e) {
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dataPanel').classList.remove('active');
   document.getElementById('loginPanel').style.display = 'block';
+  tambahAnak();
+  tambahPangkat();
+  tambahJabatan();
 });
+
+// ========== REGISTER SERVICE WORKER ==========
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(function(registration) {
+    console.log('Service Worker registered with scope:', registration.scope);
+  }).catch(function(error) {
+    console.log('Service Worker registration failed:', error);
+  });
+}
 </script>
 </body>
 </html>
