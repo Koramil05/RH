@@ -72,14 +72,14 @@
     color: white;
   }
 
-  /* KOP */
+  /* KOP - dikiri (rata kiri) */
   .kop {
     margin-bottom: 10px;
+    text-align: left;          /* pastikan parent tidak memusatkan */
   }
   .kop-text {
     display: inline-block;
-    text-align: center;
-    font-weight: bold;
+    text-align: left;          /* diubah dari center ke left */
     border-bottom: 2px solid black;
     padding-bottom: 3px;
     line-height: 1.3;
@@ -359,45 +359,22 @@
     }
   }
 
-  /* CETAK */
+  /* Sembunyikan elemen cetak utama saat tidak print, namun tetap ada */
   @media print {
-    * {
+    body * {
+      visibility: hidden;
+    }
+    .print-container, .print-container * {
+      visibility: visible;
+    }
+    .print-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      color: black !important;
-      background: white !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
+      padding: 1cm;
     }
-    .status-badge, .loading-overlay, .check-status, button, 
-    .action-buttons, .btn-login, .login-area, .umur-display, #loginPanel,
-    .card-actions, .btn-add, .section-title button {
-      display: none !important;
-    }
-    .app-container, .panel {
-      max-width: 100%;
-      padding: 0;
-      margin: 0;
-      box-shadow: none;
-    }
-    .cards-container {
-      display: block;
-    }
-    .card {
-      break-inside: avoid;
-      border: 1px solid black;
-      margin-bottom: 8px;
-      padding: 6px;
-    }
-    .card-field {
-      border: none;
-      background: none;
-      padding: 2px;
-    }
-    th:last-child, td:last-child { display: none; }
-    .value input { display: none; }
-    .value::before { content: attr(data-value); display: block; }
   }
 </style>
 </head>
@@ -409,21 +386,23 @@
   </div>
 
   <div class="panel">
-    <div class="kop"><div class="kop-text"><div>KOMANDO DISTRIK MILITER 1609</div><div>KORAMIL 1609-05/SUKASADA</div></div></div>
+    <div class="kop">
+      <div class="kop-text">
+        <div>KOMANDO DISTRIK MILITER 1609</div>
+        <div>KORAMIL 1609-05/SUKASADA</div>
+      </div>
+    </div>
 
     <div id="loginPanel" class="login-area">
       <div class="login-title">🔐 Akses Data Personel</div>
       <div class="nrp-input-group">
         <div class="value" style="position: relative;">
-          <input type="text" id="nrpInput" placeholder="Masukkan NRP Lengkap" autocomplete="off" inputmode="numeric">
+          <input type="text" id="nrpInput" placeholder="Masukkan NRP (cth: 119900123)" autocomplete="off" inputmode="numeric">
           <span id="nrpCheckStatus" class="check-status"></span>
         </div>
         <button class="btn-login" id="loginBtn">MASUK</button>
       </div>
-      <div style="font-size: 13px; color: gray;">* Masukan yang diberikan sangat berarti bagi kami dalam meningkatkan kualitas layanan dan fitur aplikasi.
-Hormat kami,
-Serka I Nyoman Arta
-(Admin & Developer Aplikasi)</div>
+      <div style="font-size: 13px; color: gray;">* Gunakan NRP yang terdaftar pada Pangkat/NRP</div>
       <div id="nrpInfo" style="font-size: 12px; margin-top: 10px;"></div>
     </div>
 
@@ -605,7 +584,6 @@ function editCard(type, idx) {
 
   const cardDiv = document.querySelector(`.card[data-type="${type}"][data-index="${idx}"]`);
   if (!cardDiv) return;
-  // Ganti konten dengan form edit
   let html = `<div class="card-edit-form">`;
   fields.forEach(f => {
     html += `<input type="text" class="card-edit-input" data-key="${f.key}" placeholder="${f.label}" value="${escapeHtml(f.value || '')}"><br>`;
@@ -633,23 +611,18 @@ function editCard(type, idx) {
 }
 
 function addNewCard(type) {
-  let newItem;
   if (type === 'anak') {
-    newItem = { nama: '', ttl: '' };
-    anakData.push(newItem);
+    anakData.push({ nama: '', ttl: '' });
     const newIdx = anakData.length - 1;
     refreshAllCards();
-    // langsung edit card baru
     setTimeout(() => editCard('anak', newIdx), 50);
   } else if (type === 'pangkat') {
-    newItem = { pangkat: '', nomor: '', tgl: '', tmt: '' };
-    pangkatData.push(newItem);
+    pangkatData.push({ pangkat: '', nomor: '', tgl: '', tmt: '' });
     const newIdx = pangkatData.length - 1;
     refreshAllCards();
     setTimeout(() => editCard('pangkat', newIdx), 50);
   } else if (type === 'jabatan') {
-    newItem = { jabatan: '', nomor: '', tgl: '', tmt: '' };
-    jabatanData.push(newItem);
+    jabatanData.push({ jabatan: '', nomor: '', tgl: '', tmt: '' });
     const newIdx = jabatanData.length - 1;
     refreshAllCards();
     setTimeout(() => editCard('jabatan', newIdx), 50);
@@ -662,7 +635,6 @@ function refreshAllCards() {
   renderJabatan();
 }
 
-// Konversi dari array of array (format lama) ke object array
 function loadDataToCards(anakArr, pangkatArr, jabatanArr) {
   anakData = (anakArr || []).map(a => ({ nama: a[0] || '', ttl: a[1] || '' }));
   pangkatData = (pangkatArr || []).map(p => ({ pangkat: p[0] || '', nomor: p[1] || '', tgl: p[2] || '', tmt: p[3] || '' }));
@@ -704,7 +676,7 @@ function hitungUmurDariString(ttlStr) {
   return new Date().getFullYear() - parseInt(match[0]) + " tahun";
 }
 
-async function checkNRPExists(nrp) { /* sama seperti sebelumnya, disederhanakan */ 
+async function checkNRPExists(nrp) {
   if (!nrp || nrp === lastCheckedNRP) return nrpExists;
   lastCheckedNRP = nrp;
   const checkSpan = document.getElementById('nrpCheckStatus');
@@ -823,11 +795,184 @@ async function simpanData() {
   } catch(e) { saveToLocalStorage(payload); hideLoading(); simpanBtn.disabled=false; alert("⚠️ Gagal koneksi, tersimpan lokal."); }
 }
 
+// ========== CETAK DENGAN TABEL (KOP KIRI) ==========
 function cetakForm() {
-  // persiapan cetak untuk data utama dan card (card sudah tanpa input)
-  let rows = ['nama','pangkat','jabatan','ttl','alamat','istri','ttl_istri','nikah'];
-  rows.forEach(id => { let el = document.getElementById(id); if(el && el.parentElement) el.parentElement.setAttribute('data-value', el.value || '-'); });
-  window.print();
+  // Ambil data terkini dari form dan card
+  const nama = document.getElementById('nama').value || '-';
+  const pangkat = document.getElementById('pangkat').value || '-';
+  const jabatan = document.getElementById('jabatan').value || '-';
+  const ttl = document.getElementById('ttl').value || '-';
+  const umur = document.getElementById('umur').innerText || '-';
+  const alamat = document.getElementById('alamat').value || '-';
+  const istri = document.getElementById('istri').value || '-';
+  const ttl_istri = document.getElementById('ttl_istri').value || '-';
+  const nikah = document.getElementById('nikah').value || '-';
+  const { anakArr, pangkatArr, jabatanArr } = getDataFromCards();
+
+  // Fungsi untuk membuat baris tabel
+  function buatTabelAnak() {
+    if (!anakArr.length) return '<p><em>Tidak ada data anak</em></p>';
+    let html = `<table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse:collapse; margin-top:10px;">
+      <thead><tr><th>No</th><th>Nama</th><th>TTL Anak</th></tr></thead><tbody>`;
+    anakArr.forEach((a, idx) => {
+      html += `<tr><td>${idx+1}</td><td>${escapeHtml(a[0])}</td><td>${escapeHtml(a[1])}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  function buatTabelPangkat() {
+    if (!pangkatArr.length) return '<p><em>Tidak ada data riwayat pangkat</em></p>';
+    let html = `<table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse:collapse; margin-top:10px;">
+      <thead><tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th></tr></thead><tbody>`;
+    pangkatArr.forEach((p, idx) => {
+      html += `<tr><td>${idx+1}</td><td>${escapeHtml(p[0])}</td><td>${escapeHtml(p[1])}</td><td>${escapeHtml(p[2])}</td><td>${escapeHtml(p[3])}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  function buatTabelJabatan() {
+    if (!jabatanArr.length) return '<p><em>Tidak ada data riwayat jabatan</em></p>';
+    let html = `<table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse:collapse; margin-top:10px;">
+      <thead><tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th></tr></thead><tbody>`;
+    jabatanArr.forEach((j, idx) => {
+      html += `<tr><td>${idx+1}</td><td>${escapeHtml(j[0])}</td><td>${escapeHtml(j[1])}</td><td>${escapeHtml(j[2])}</td><td>${escapeHtml(j[3])}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  // HTML lengkap untuk cetak dengan kop kiri
+  const printHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Cetak Data Personil - Koramil 1609-05/Sukasada</title>
+      <style>
+        body {
+          font-family: Arial, Helvetica, sans-serif;
+          margin: 1.5cm;
+          font-size: 12px;
+        }
+        .kop {
+          text-align: left;
+          margin-bottom: 20px;
+        }
+        .kop-text {
+          display: inline-block;
+          text-align: left;
+          font-weight: bold;
+          border-bottom: 2px solid black;
+          padding-bottom: 3px;
+          line-height: 1.3;
+        }
+        .row {
+          display: flex;
+          margin-bottom: 8px;
+        }
+        .label {
+          width: 140px;
+          font-weight: bold;
+        }
+        .value {
+          flex: 1;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 12px 0;
+        }
+        th, td {
+          border: 1px solid #000;
+          padding: 6px 4px;
+          text-align: center;
+          vertical-align: top;
+        }
+        th {
+          background: #f2f2f2;
+        }
+        .section-title {
+          font-weight: bold;
+          margin: 16px 0 6px 0;
+          font-size: 14px;
+        }
+        hr {
+          margin: 12px 0;
+        }
+        @media print {
+          body {
+            margin: 0;
+            padding: 1cm;
+          }
+          .no-print {
+            display: none;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="kop">
+        <div class="kop-text">
+          <div>KOMANDO DISTRIK MILITER 1609</div>
+          <div>KORAMIL 1609-05/SUKASADA</div>
+        </div>
+      </div>
+
+      <div class="row"><div class="label">Nama</div><div class="value">: ${escapeHtml(nama)}</div></div>
+      <div class="row"><div class="label">Pangkat / NRP</div><div class="value">: ${escapeHtml(pangkat)}</div></div>
+      <div class="row"><div class="label">Jabatan</div><div class="value">: ${escapeHtml(jabatan)}</div></div>
+      <div class="row"><div class="label">TTL Personel</div><div class="value">: ${escapeHtml(ttl)} (Umur: ${escapeHtml(umur)})</div></div>
+      <div class="row"><div class="label">Alamat</div><div class="value">: ${escapeHtml(alamat)}</div></div>
+      <div class="row"><div class="label">Nama Istri</div><div class="value">: ${escapeHtml(istri)}</div></div>
+      <div class="row"><div class="label">TTL Istri</div><div class="value">: ${escapeHtml(ttl_istri)}</div></div>
+      <div class="row"><div class="label">Akta Nikah</div><div class="value">: ${escapeHtml(nikah)}</div></div>
+
+      <div class="section-title">A. DATA ANAK</div>
+      ${buatTabelAnak()}
+
+      <div class="section-title">B. RIWAYAT PANGKAT</div>
+      ${buatTabelPangkat()}
+
+      <div class="section-title">C. RIWAYAT JABATAN</div>
+      ${buatTabelJabatan()}
+
+      <div style="margin-top: 30px; font-size: 10px; text-align: center;">Dicetak pada: ${new Date().toLocaleString()}</div>
+    </body>
+    </html>
+  `;
+
+  // Buat iframe untuk cetak
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'absolute';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = 'none';
+  document.body.appendChild(iframe);
+  const iframeDoc = iframe.contentWindow.document;
+  iframeDoc.open();
+  iframeDoc.write(printHtml);
+  iframeDoc.close();
+
+  // Tunggu konten siap lalu cetak
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
+  };
+  // Jika onload tidak terpicu, panggil langsung setelah timeout
+  setTimeout(() => {
+    if (iframe.contentWindow) {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+      }, 1000);
+    }
+  }, 500);
 }
 
 function logout() {
