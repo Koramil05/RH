@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>KORAMIL 1609-05/SUKASADA</title>
+<title>Data Personil - Kodim 1609</title>
 
 <!-- PWA Manifest -->
 <link rel="manifest" href="manifest.json">
@@ -11,10 +11,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Data Personil">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c7da0'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E📋%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
 
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c7da0'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E📋%3C/text%3E%3C/svg%3E">
+<!-- Icons untuk berbagai ukuran -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 
 <style>
   * {
@@ -244,7 +246,7 @@
     color: #10b981;
   }
 
-  /* Tabel - KOLOM NO DIPERKECIL */
+  /* Tabel */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -259,11 +261,9 @@
     vertical-align: middle;
     word-break: break-word;
   }
-  /* Kolom No - lebar kecil */
   th:first-child, td:first-child {
     width: 40px;
   }
-  /* Kolom Aksi - lebar kecil */
   th:last-child, td:last-child {
     width: 60px;
   }
@@ -309,7 +309,7 @@
     background: #475569;
   }
 
-  /* CETAK - HITAM PUTIH, ARIAL */
+  /* CETAK */
   @media print {
     * {
       margin: 0;
@@ -366,12 +366,10 @@
       display: block !important;
     }
     
-    /* Kolom No dan Aksi tetap kecil saat cetak */
     th:first-child, td:first-child {
       width: 40px !important;
     }
     th:last-child, td:last-child {
-      width: 60px !important;
       display: none !important;
     }
     
@@ -428,10 +426,7 @@
 </head>
 <body>
 <div class="app-container">
-  <!-- Status Online/Offline -->
   <div id="statusBadge" class="status-badge status-checking">🔄 Cek Koneksi...</div>
-
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-spinner">
       <div class="spinner"></div>
@@ -440,20 +435,18 @@
   </div>
 
   <div class="panel">
-    <!-- KOP -->
     <div class="kop">
       <div class="kop-text">
+        <div>KOMANDO RESOR MILITER 163/WIRA SATYA</div>
         <div>KOMANDO DISTRIK MILITER 1609</div>
-        <div>KORAMIL 1609-05/SUKASADA</div>
       </div>
     </div>
 
-    <!-- Panel LOGIN (NRP) -->
     <div id="loginPanel" class="login-area">
       <div class="login-title">🔐 Akses Data Personel</div>
       <div class="nrp-input-group">
         <div class="value" style="position: relative;">
-          <input type="text" id="nrpInput" placeholder="MASUKKAN NRP LENGKAP" autocomplete="off" inputmode="numeric">
+          <input type="text" id="nrpInput" placeholder="Masukkan NRP (cth: 119900123)" autocomplete="off" inputmode="numeric">
           <span id="nrpCheckStatus" class="check-status"></span>
         </div>
         <button class="btn-login" id="loginBtn">MASUK</button>
@@ -462,7 +455,6 @@
       <div id="nrpInfo" style="font-size: 12px; margin-top: 10px; color: #f59e0b;"></div>
     </div>
 
-    <!-- FORM DATA PERSONIL -->
     <div id="dataPanel" class="form-section">
       <div class="row">
         <div class="label">Nama</div>
@@ -487,28 +479,25 @@
       <div class="row"><div class="label">TTL Istri</div><div class="value"><input id="ttl_istri"></div></div>
       <div class="row"><div class="label">Akta Nikah</div><div class="value"><input id="nikah"></div></div>
 
-      <b>A. DATA ANAK</b>
+      <b> DATA ANAK</b>
       <table id="anakTable">
-        <thead>
-          <tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th> </thead>
+        <thead><tr><th>No</th><th>Nama</th><th>TTL</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
-        </table>
+      </table>
       <button onclick="tambahAnak()">+ Tambah Anak</button><br><br>
 
-      <b>B. RIWAYAT PANGKAT</b>
+      <b> RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
-        <thead>
-          <tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> </thead>
+        <thead><tr><th>No</th><th>Pangkat</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
-        </table>
+      </table>
       <button onclick="tambahPangkat()">+ Tambah Pangkat</button><br><br>
 
-      <b>C. RIWAYAT JABATAN</b>
+      <b> RIWAYAT JABATAN</b>
       <table id="jabatanTable">
-        <thead>
-          <tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th> </thead>
+        <thead><tr><th>No</th><th>Jabatan</th><th>No SK</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
-        </table>
+      </table>
       <button onclick="tambahJabatan()">+ Tambah Jabatan</button>
 
       <div class="action-buttons">
@@ -607,7 +596,6 @@ function updateCheckStatus(exists, checkSpan, pangkatCheckSpan) {
   }
 }
 
-// ========== EKSTRAK NRP DARI PANGKAT ==========
 function extractNRPFromPangkat(pangkatText) {
   if (!pangkatText) return null;
   let cleanText = pangkatText.trim();
@@ -622,7 +610,6 @@ function extractNRPFromPangkat(pangkatText) {
   return match ? match[0] : null;
 }
 
-// Event listener untuk cek NRP saat input
 let nrpCheckTimeout;
 document.getElementById('nrpInput').addEventListener('input', function(e) {
   clearTimeout(nrpCheckTimeout);
@@ -649,7 +636,6 @@ document.getElementById('pangkat').addEventListener('input', function(e) {
   }
 });
 
-// ========== STATUS ONLINE/OFFLINE ==========
 function updateStatusBadge() {
   const badge = document.getElementById('statusBadge');
   if (isOnline) {
@@ -691,7 +677,6 @@ window.addEventListener('offline', () => {
   updateStatusBadge();
 });
 
-// ========== LOADING OVERLAY ==========
 function showLoading(message = 'Memproses...') {
   document.getElementById('loadingText').innerText = message;
   document.getElementById('loadingOverlay').style.display = 'flex';
@@ -701,7 +686,6 @@ function hideLoading() {
   document.getElementById('loadingOverlay').style.display = 'none';
 }
 
-// ========== SIMPAN DATA OFFLINE ==========
 function saveToLocalStorage(data) {
   const pendingKey = "pending_save_" + currentNRP;
   localStorage.setItem(pendingKey, JSON.stringify({
@@ -736,7 +720,6 @@ async function retryPendingSave() {
   }
 }
 
-// ========== HITUNG UMUR ==========
 function hitungUmur() {
   const ttlVal = document.getElementById('ttl').value;
   const umurSpan = document.getElementById('umur');
@@ -784,38 +767,19 @@ function tambahAnak() {
   let tbody = document.querySelector('#anakTable tbody');
   let row = tbody.insertRow();
   let no = tbody.rows.length;
-  row.innerHTML = `
-     <td>${no}</td>
-     <td><input placeholder="Nama anak"></td>
-     <td><input placeholder="Kota, DD-MM-YYYY"></td>
-     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-  `;
+  row.innerHTML = `<td>${no}</td><td><input placeholder="Nama anak"></td><td><input placeholder="Kota, DD-MM-YYYY"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
 }
 function tambahPangkat() {
   let tbody = document.querySelector('#pangkatTable tbody');
   let row = tbody.insertRow();
   let no = tbody.rows.length;
-  row.innerHTML = `
-     <td>${no}</td>
-     <td><input placeholder="Pangkat"></td>
-     <td><input placeholder="No SK"></td>
-     <td><input placeholder="DD-MM-YYYY"></td>
-     <td><input placeholder="TMT"></td>
-     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-  `;
+  row.innerHTML = `<td>${no}</td><td><input placeholder="Pangkat"></td><td><input placeholder="No SK"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
 }
 function tambahJabatan() {
   let tbody = document.querySelector('#jabatanTable tbody');
   let row = tbody.insertRow();
   let no = tbody.rows.length;
-  row.innerHTML = `
-     <td>${no}</td>
-     <td><input placeholder="Jabatan"></td>
-     <td><input placeholder="No SK"></td>
-     <td><input placeholder="DD-MM-YYYY"></td>
-     <td><input placeholder="TMT"></td>
-     <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-  `;
+  row.innerHTML = `<td>${no}</td><td><input placeholder="Jabatan"></td><td><input placeholder="No SK"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
 }
 function hapusBaris(btn) {
   if (confirm("Hapus data ini?")) {
@@ -828,7 +792,6 @@ function hapusBaris(btn) {
   }
 }
 
-// ========== LOGIN ==========
 async function loginWithNRP() {
   const nrp = document.getElementById('nrpInput').value.trim();
   if (!nrp) {
@@ -914,7 +877,6 @@ async function loginWithNRP() {
   }
 }
 
-// ========== ISI FORM ==========
 function isiFormDenganData(data) {
   document.getElementById('nama').value = data.nama || '';
   document.getElementById('pangkat').value = data.pangkat || '';
@@ -936,45 +898,25 @@ function isiFormDenganData(data) {
   if (data.anak && data.anak.length) {
     data.anak.forEach((an, idx) => {
       let row = anakTbody.insertRow();
-      row.innerHTML = `
-         <td>${idx+1}</td>
-         <td><input value="${escapeHtml(an[0])}"></td>
-         <td><input value="${escapeHtml(an[1])}"></td>
-         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-      `;
+      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(an[0])}"></td><td><input value="${escapeHtml(an[1])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahAnak(); }
   
   if (data.pangkat_list && data.pangkat_list.length) {
     data.pangkat_list.forEach((p, idx) => {
       let row = pangkatTbody.insertRow();
-      row.innerHTML = `
-         <td>${idx+1}</td>
-         <td><input value="${escapeHtml(p[0])}"></td>
-         <td><input value="${escapeHtml(p[1])}"></td>
-         <td><input value="${escapeHtml(p[2])}"></td>
-         <td><input value="${escapeHtml(p[3])}"></td>
-         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-      `;
+      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(p[0])}"></td><td><input value="${escapeHtml(p[1])}"></td><td><input value="${escapeHtml(p[2])}"></td><td><input value="${escapeHtml(p[3])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahPangkat(); }
   
   if (data.jabatan_list && data.jabatan_list.length) {
     data.jabatan_list.forEach((j, idx) => {
       let row = jabatanTbody.insertRow();
-      row.innerHTML = `
-         <td>${idx+1}</td>
-         <td><input value="${escapeHtml(j[0])}"></td>
-         <td><input value="${escapeHtml(j[1])}"></td>
-         <td><input value="${escapeHtml(j[2])}"></td>
-         <td><input value="${escapeHtml(j[3])}"></td>
-         <td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>
-      `;
+      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(j[0])}"></td><td><input value="${escapeHtml(j[1])}"></td><td><input value="${escapeHtml(j[2])}"></td><td><input value="${escapeHtml(j[3])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
     });
   } else { tambahJabatan(); }
 }
 
-// ========== SIMPAN DATA ==========
 async function simpanData() {
   if (!currentNRP) {
     alert("Sesi habis, silakan login ulang");
@@ -1076,7 +1018,6 @@ async function simpanData() {
   }
 }
 
-// ========== CETAK ==========
 function cetakForm() {
   let tables = ['anakTable','pangkatTable','jabatanTable'];
   tables.forEach(tid => {
@@ -1102,7 +1043,6 @@ function cetakForm() {
   window.print();
 }
 
-// ========== LOGOUT ==========
 function logout() {
   currentNRP = null;
   nrpExists = false;
@@ -1158,7 +1098,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ========== REGISTER SERVICE WORKER ==========
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(function(registration) {
+  navigator.serviceWorker.register('sw.js').then(function(registration) {
     console.log('Service Worker registered with scope:', registration.scope);
   }).catch(function(error) {
     console.log('Service Worker registration failed:', error);
