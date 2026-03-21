@@ -246,7 +246,7 @@
     color: #10b981;
   }
 
-  /* Tabel */
+  /* Tabel dengan popup input */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -265,17 +265,25 @@
     width: 40px;
   }
   th:last-child, td:last-child {
-    width: 60px;
+    width: 70px;
   }
   th {
     background: #eef2ff;
     font-weight: 600;
   }
-  td input {
-    width: 95%;
-    padding: 6px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
+  .btn-edit, .btn-hapus {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 0 4px;
+    padding: 4px;
+  }
+  .btn-edit {
+    color: #2c7da0;
+  }
+  .btn-hapus {
+    color: #b91c1c;
   }
   button {
     background: #2c7da0;
@@ -309,6 +317,95 @@
     background: #475569;
   }
 
+  /* Modal Popup */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 16px;
+  }
+  .modal-container {
+    background: white;
+    border-radius: 28px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+    animation: modalFadeIn 0.2s ease;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-header {
+    padding: 20px 20px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h3 {
+    font-size: 20px;
+    color: #1e466e;
+  }
+  .modal-close {
+    font-size: 28px;
+    cursor: pointer;
+    color: #94a3b8;
+    line-height: 1;
+  }
+  .modal-body {
+    padding: 20px;
+  }
+  .modal-body .input-group {
+    margin-bottom: 20px;
+  }
+  .modal-body label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1e466e;
+    font-size: 14px;
+  }
+  .modal-body input {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    background: #f8fafc;
+  }
+  .modal-body input:focus {
+    outline: none;
+    border-color: #2c7da0;
+    background: white;
+  }
+  .modal-footer {
+    padding: 16px 20px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .modal-footer button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  .btn-modal-simpan {
+    background: #2c7da0;
+  }
+  .btn-modal-batal {
+    background: #94a3b8;
+  }
+
   /* CETAK */
   @media print {
     * {
@@ -331,7 +428,8 @@
     }
     
     .status-badge, .loading-overlay, .check-status, button, 
-    .action-buttons, .btn-login, .login-area, .umur-display, #loginPanel {
+    .action-buttons, .btn-login, .login-area, .umur-display, #loginPanel,
+    .modal-overlay {
       display: none !important;
     }
     
@@ -373,28 +471,8 @@
       display: none !important;
     }
     
-    td input {
-      display: none !important;
-    }
-    
-    td[data-value]::before {
-      content: attr(data-value);
+    table td span {
       display: block;
-      text-align: center;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 10px 0;
-      table-layout: fixed;
-    }
-    
-    th, td {
-      border: 1px solid black !important;
-      padding: 8px 4px;
-      text-align: center;
-      vertical-align: middle;
     }
     
     .row {
@@ -484,27 +562,44 @@
         <thead><tr><th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
-      <button onclick="tambahAnak()">+ Tambah Anak</button><br><br>
+      <button id="tambahAnakBtn">+ Tambah Anak</button><br><br>
 
       <b>B. RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
         <thead><tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
-      <button onclick="tambahPangkat()">+ Tambah Pangkat</button><br><br>
+      <button id="tambahPangkatBtn">+ Tambah Pangkat</button><br><br>
 
       <b>C. RIWAYAT JABATAN</b>
       <table id="jabatanTable">
         <thead><tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
-      <button onclick="tambahJabatan()">+ Tambah Jabatan</button>
+      <button id="tambahJabatanBtn">+ Tambah Jabatan</button>
 
       <div class="action-buttons">
         <button id="simpanBtn" onclick="simpanData()">💾 SIMPAN</button>
         <button onclick="cetakForm()">🖨 CETAK</button>
         <button class="btn-logout" onclick="logout()">🚪 LOGOUT / GANTI NRP</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Popup -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 id="modalTitle">Tambah Data</h3>
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Dinamis diisi JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-batal" onclick="closeModal()">Batal</button>
+      <button class="btn-modal-simpan" id="modalSimpanBtn">Simpan</button>
     </div>
   </div>
 </div>
@@ -516,46 +611,250 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwlAwUy0TyQ4pXscAVH
 // ========== STORAGE KEY ==========
 const CHECKED_NRPS_KEY = "checked_nrps";
 
-// ========== FUNGSI GLOBAL ==========
+// ========== DATA ARRAY ==========
+let anakData = [];
+let pangkatData = [];
+let jabatanData = [];
+
+// ========== GLOBAL ==========
 let currentNRP = null;
 let isOnline = true;
 let nrpExists = false;
 let lastCheckedNRP = null;
 
-// ========== CEK DUPLIKASI NRP ==========
+// Modal state
+let currentModalType = null;   // 'anak', 'pangkat', 'jabatan'
+let currentEditIndex = -1;      // -1 untuk tambah baru
+
+// ========== FUNGSI RENDER TABEL ==========
+function renderAnak() {
+  let tbody = document.querySelector('#anakTable tbody');
+  tbody.innerHTML = '';
+  anakData.forEach((item, idx) => {
+    let row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${idx+1}</td>
+      <td><span>${escapeHtml(item[0] || '')}</span></td>
+      <td><span>${escapeHtml(item[1] || '')}</span></td>
+      <td>
+        <button class="btn-edit" onclick="editAnak(${idx})">✏️</button>
+        <button class="btn-hapus" onclick="hapusAnak(${idx})">🗑️</button>
+      </td>
+    `;
+  });
+}
+
+function renderPangkat() {
+  let tbody = document.querySelector('#pangkatTable tbody');
+  tbody.innerHTML = '';
+  pangkatData.forEach((item, idx) => {
+    let row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${idx+1}</td>
+      <td><span>${escapeHtml(item[0] || '')}</span></td>
+      <td><span>${escapeHtml(item[1] || '')}</span></td>
+      <td><span>${escapeHtml(item[2] || '')}</span></td>
+      <td><span>${escapeHtml(item[3] || '')}</span></td>
+      <td>
+        <button class="btn-edit" onclick="editPangkat(${idx})">✏️</button>
+        <button class="btn-hapus" onclick="hapusPangkat(${idx})">🗑️</button>
+      </td>
+    `;
+  });
+}
+
+function renderJabatan() {
+  let tbody = document.querySelector('#jabatanTable tbody');
+  tbody.innerHTML = '';
+  jabatanData.forEach((item, idx) => {
+    let row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${idx+1}</td>
+      <td><span>${escapeHtml(item[0] || '')}</span></td>
+      <td><span>${escapeHtml(item[1] || '')}</span></td>
+      <td><span>${escapeHtml(item[2] || '')}</span></td>
+      <td><span>${escapeHtml(item[3] || '')}</span></td>
+      <td>
+        <button class="btn-edit" onclick="editJabatan(${idx})">✏️</button>
+        <button class="btn-hapus" onclick="hapusJabatan(${idx})">🗑️</button>
+      </td>
+    `;
+  });
+}
+
+// ========== MODAL POPUP ==========
+function openModal(type, index = -1) {
+  currentModalType = type;
+  currentEditIndex = index;
+  const modal = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  
+  let fieldsHtml = '';
+  if (type === 'anak') {
+    modalTitle.innerText = index === -1 ? 'Tambah Anak' : 'Edit Anak';
+    fieldsHtml = `
+      <div class="input-group">
+        <label>Nama Anak</label>
+        <input type="text" id="modal_nama" placeholder="Nama lengkap anak">
+      </div>
+      <div class="input-group">
+        <label>TTL Anak</label>
+        <input type="text" id="modal_ttl" placeholder="Kota, DD-MM-YYYY">
+      </div>
+    `;
+  } else if (type === 'pangkat') {
+    modalTitle.innerText = index === -1 ? 'Tambah Riwayat Pangkat' : 'Edit Riwayat Pangkat';
+    fieldsHtml = `
+      <div class="input-group"><label>Pangkat</label><input type="text" id="modal_pangkat" placeholder="Pangkat"></div>
+      <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
+      <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT"></div>
+    `;
+  } else if (type === 'jabatan') {
+    modalTitle.innerText = index === -1 ? 'Tambah Riwayat Jabatan' : 'Edit Riwayat Jabatan';
+    fieldsHtml = `
+      <div class="input-group"><label>Jabatan</label><input type="text" id="modal_jabatan" placeholder="Jabatan"></div>
+      <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
+      <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT"></div>
+    `;
+  }
+  modalBody.innerHTML = fieldsHtml;
+  
+  // Jika edit, isi nilai yang ada
+  if (index !== -1) {
+    if (type === 'anak') {
+      document.getElementById('modal_nama').value = anakData[index][0] || '';
+      document.getElementById('modal_ttl').value = anakData[index][1] || '';
+    } else if (type === 'pangkat') {
+      document.getElementById('modal_pangkat').value = pangkatData[index][0] || '';
+      document.getElementById('modal_nomor').value = pangkatData[index][1] || '';
+      document.getElementById('modal_tgl').value = pangkatData[index][2] || '';
+      document.getElementById('modal_tmt').value = pangkatData[index][3] || '';
+    } else if (type === 'jabatan') {
+      document.getElementById('modal_jabatan').value = jabatanData[index][0] || '';
+      document.getElementById('modal_nomor').value = jabatanData[index][1] || '';
+      document.getElementById('modal_tgl').value = jabatanData[index][2] || '';
+      document.getElementById('modal_tmt').value = jabatanData[index][3] || '';
+    }
+  }
+  
+  modal.style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  currentModalType = null;
+  currentEditIndex = -1;
+}
+
+function simpanModal() {
+  if (currentModalType === 'anak') {
+    const nama = document.getElementById('modal_nama').value.trim();
+    const ttl = document.getElementById('modal_ttl').value.trim();
+    if (!nama) {
+      alert('Nama anak wajib diisi');
+      return;
+    }
+    const dataBaru = [nama, ttl];
+    if (currentEditIndex === -1) {
+      anakData.push(dataBaru);
+    } else {
+      anakData[currentEditIndex] = dataBaru;
+    }
+    renderAnak();
+  } 
+  else if (currentModalType === 'pangkat') {
+    const pangkatVal = document.getElementById('modal_pangkat').value.trim();
+    const nomor = document.getElementById('modal_nomor').value.trim();
+    const tgl = document.getElementById('modal_tgl').value.trim();
+    const tmt = document.getElementById('modal_tmt').value.trim();
+    if (!pangkatVal) {
+      alert('Pangkat wajib diisi');
+      return;
+    }
+    const dataBaru = [pangkatVal, nomor, tgl, tmt];
+    if (currentEditIndex === -1) {
+      pangkatData.push(dataBaru);
+    } else {
+      pangkatData[currentEditIndex] = dataBaru;
+    }
+    renderPangkat();
+  }
+  else if (currentModalType === 'jabatan') {
+    const jabatanVal = document.getElementById('modal_jabatan').value.trim();
+    const nomor = document.getElementById('modal_nomor').value.trim();
+    const tgl = document.getElementById('modal_tgl').value.trim();
+    const tmt = document.getElementById('modal_tmt').value.trim();
+    if (!jabatanVal) {
+      alert('Jabatan wajib diisi');
+      return;
+    }
+    const dataBaru = [jabatanVal, nomor, tgl, tmt];
+    if (currentEditIndex === -1) {
+      jabatanData.push(dataBaru);
+    } else {
+      jabatanData[currentEditIndex] = dataBaru;
+    }
+    renderJabatan();
+  }
+  closeModal();
+}
+
+// ========== CRUD FUNCTIONS ==========
+function tambahAnak() { openModal('anak', -1); }
+function editAnak(idx) { openModal('anak', idx); }
+function hapusAnak(idx) {
+  if (confirm('Hapus data anak ini?')) {
+    anakData.splice(idx, 1);
+    renderAnak();
+  }
+}
+function tambahPangkat() { openModal('pangkat', -1); }
+function editPangkat(idx) { openModal('pangkat', idx); }
+function hapusPangkat(idx) {
+  if (confirm('Hapus riwayat pangkat ini?')) {
+    pangkatData.splice(idx, 1);
+    renderPangkat();
+  }
+}
+function tambahJabatan() { openModal('jabatan', -1); }
+function editJabatan(idx) { openModal('jabatan', idx); }
+function hapusJabatan(idx) {
+  if (confirm('Hapus riwayat jabatan ini?')) {
+    jabatanData.splice(idx, 1);
+    renderJabatan();
+  }
+}
+
+// ========== CEK DUPLIKASI NRP (SAMA) ==========
 async function checkNRPExists(nrp) {
   if (!nrp || nrp === lastCheckedNRP) return nrpExists;
-  
   lastCheckedNRP = nrp;
   const checkSpan = document.getElementById('nrpCheckStatus');
   const pangkatCheckSpan = document.getElementById('pangkatCheckStatus');
-  
   if (checkSpan) checkSpan.innerHTML = '🔄';
   if (pangkatCheckSpan) pangkatCheckSpan.innerHTML = '🔄';
   
   const localCache = localStorage.getItem(CHECKED_NRPS_KEY);
   const cached = localCache ? JSON.parse(localCache) : {};
-  
   if (cached[nrp] !== undefined) {
     nrpExists = cached[nrp];
     updateCheckStatus(nrpExists, checkSpan, pangkatCheckSpan);
     return nrpExists;
   }
-  
   if (!isOnline) {
     nrpExists = false;
     updateCheckStatus(false, checkSpan, pangkatCheckSpan);
     return false;
   }
-  
   try {
     const response = await fetch(`${WEB_APP_URL}?id=${encodeURIComponent(nrp)}`);
     const data = await response.json();
     nrpExists = !data.error;
-    
     cached[nrp] = nrpExists;
     localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(cached));
-    
     updateCheckStatus(nrpExists, checkSpan, pangkatCheckSpan);
     return nrpExists;
   } catch (err) {
@@ -585,7 +884,6 @@ function updateCheckStatus(exists, checkSpan, pangkatCheckSpan) {
       pangkatCheckSpan.innerHTML = '';
     }
   }
-  
   const nrpInfo = document.getElementById('nrpInfo');
   if (nrpInfo && exists) {
     nrpInfo.innerHTML = '⚠️ NRP sudah terdaftar. Data akan DIGANTI dengan yang baru.';
@@ -599,13 +897,11 @@ function updateCheckStatus(exists, checkSpan, pangkatCheckSpan) {
 function extractNRPFromPangkat(pangkatText) {
   if (!pangkatText) return null;
   let cleanText = pangkatText.trim();
-  
   if (cleanText.includes("/")) {
     let lastPart = cleanText.split("/").pop().trim();
     let match = lastPart.match(/\d+/);
     if (match) return match[0];
   }
-  
   let match = cleanText.match(/\d+/);
   return match ? match[0] : null;
 }
@@ -651,71 +947,35 @@ function checkConnection() {
   const badge = document.getElementById('statusBadge');
   badge.className = 'status-badge status-checking';
   badge.innerHTML = '🔄 Mengecek...';
-  
   fetch(WEB_APP_URL + '?check=1', { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' })
-    .then(() => {
-      isOnline = true;
-      updateStatusBadge();
-      retryPendingSave();
-    })
-    .catch(() => {
-      isOnline = false;
-      updateStatusBadge();
-    });
+    .then(() => { isOnline = true; updateStatusBadge(); retryPendingSave(); })
+    .catch(() => { isOnline = false; updateStatusBadge(); });
 }
-
 setInterval(checkConnection, 30000);
 checkConnection();
-
-window.addEventListener('online', () => {
-  isOnline = true;
-  updateStatusBadge();
-  retryPendingSave();
-});
-window.addEventListener('offline', () => {
-  isOnline = false;
-  updateStatusBadge();
-});
+window.addEventListener('online', () => { isOnline = true; updateStatusBadge(); retryPendingSave(); });
+window.addEventListener('offline', () => { isOnline = false; updateStatusBadge(); });
 
 function showLoading(message = 'Memproses...') {
   document.getElementById('loadingText').innerText = message;
   document.getElementById('loadingOverlay').style.display = 'flex';
 }
-
-function hideLoading() {
-  document.getElementById('loadingOverlay').style.display = 'none';
-}
+function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
 function saveToLocalStorage(data) {
   const pendingKey = "pending_save_" + currentNRP;
-  localStorage.setItem(pendingKey, JSON.stringify({
-    data: data,
-    timestamp: new Date().toISOString(),
-    nrp: currentNRP
-  }));
+  localStorage.setItem(pendingKey, JSON.stringify({ data: data, timestamp: new Date().toISOString(), nrp: currentNRP }));
 }
-
-function clearPendingSave() {
-  const pendingKey = "pending_save_" + currentNRP;
-  localStorage.removeItem(pendingKey);
-}
-
+function clearPendingSave() { localStorage.removeItem("pending_save_" + currentNRP); }
 async function retryPendingSave() {
-  if (!isOnline) return;
-  
-  const pendingKey = "pending_save_" + currentNRP;
-  const pending = localStorage.getItem(pendingKey);
-  if (pending && currentNRP) {
+  if (!isOnline || !currentNRP) return;
+  const pending = localStorage.getItem("pending_save_" + currentNRP);
+  if (pending) {
     try {
       const data = JSON.parse(pending);
-      await fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data.data)
-      });
+      await fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data.data) });
       clearPendingSave();
-      alert("✅ Data yang tersimpan saat offline berhasil disinkronkan!");
+      alert("✅ Data offline berhasil disinkronkan!");
     } catch(e) {}
   }
 }
@@ -739,7 +999,6 @@ function hitungUmur() {
   if (months < 0) { years--; months += 12; }
   umurSpan.innerText = `${years} th ${months} bl ${days} hr`;
 }
-
 function hitungUmurDariString(ttlStr) {
   if (!ttlStr) return "";
   const match = ttlStr.match(/\b(19|20)\d{2}\b/);
@@ -747,85 +1006,31 @@ function hitungUmurDariString(ttlStr) {
   return new Date().getFullYear() - parseInt(match[0]) + " tahun";
 }
 
-function ambilDataTable(tableId) {
-  let tbody = document.querySelector(`#${tableId} tbody`);
-  if (!tbody) return [];
-  let result = [];
-  for (let i = 0; i < tbody.rows.length; i++) {
-    let row = tbody.rows[i];
-    let rowData = [];
-    for (let j = 1; j < row.cells.length - 1; j++) {
-      let inp = row.cells[j].querySelector('input');
-      rowData.push(inp ? inp.value : '');
-    }
-    result.push(rowData);
-  }
-  return result;
-}
-
-function tambahAnak() {
-  let tbody = document.querySelector('#anakTable tbody');
-  let row = tbody.insertRow();
-  let no = tbody.rows.length;
-  row.innerHTML = `<td>${no}</td><td><input placeholder="Nama anak"></td><td><input placeholder="Kota, DD-MM-YYYY"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-}
-function tambahPangkat() {
-  let tbody = document.querySelector('#pangkatTable tbody');
-  let row = tbody.insertRow();
-  let no = tbody.rows.length;
-  row.innerHTML = `<td>${no}</td><td><input placeholder="Pangkat"></td><td><input placeholder="Nomor Sprin/Skep"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-}
-function tambahJabatan() {
-  let tbody = document.querySelector('#jabatanTable tbody');
-  let row = tbody.insertRow();
-  let no = tbody.rows.length;
-  row.innerHTML = `<td>${no}</td><td><input placeholder="Jabatan"></td><td><input placeholder="No SK"></td><td><input placeholder="DD-MM-YYYY"></td><td><input placeholder="TMT"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-}
-function hapusBaris(btn) {
-  if (confirm("Hapus data ini?")) {
-    let row = btn.closest('tr');
-    let tbody = row.parentNode;
-    row.remove();
-    for(let i = 0; i < tbody.rows.length; i++) {
-      tbody.rows[i].cells[0].innerHTML = i + 1;
-    }
-  }
-}
-
 async function loginWithNRP() {
   const nrp = document.getElementById('nrpInput').value.trim();
-  if (!nrp) {
-    alert("Masukkan NRP terlebih dahulu");
-    return false;
-  }
-  
+  if (!nrp) { alert("Masukkan NRP"); return false; }
   showLoading('Memuat data personel...');
   const loginBtn = document.getElementById('loginBtn');
   loginBtn.disabled = true;
-  
   try {
     const offlineKey = "personil_cache_" + nrp;
     const offlineData = localStorage.getItem(offlineKey);
-    
     if (!isOnline && offlineData) {
       const data = JSON.parse(offlineData);
       currentNRP = nrp;
       isiFormDenganData(data);
       document.getElementById('loginPanel').style.display = 'none';
       document.getElementById('dataPanel').classList.add('active');
-      alert("⚠️ Mode Offline: Menampilkan data terakhir yang tersimpan.");
+      alert("⚠️ Mode Offline: Menampilkan data terakhir.");
       hideLoading();
       loginBtn.disabled = false;
       return true;
     }
-    
     const response = await fetch(`${WEB_APP_URL}?id=${encodeURIComponent(nrp)}`);
     const data = await response.json();
-    
     if (data.error) {
       if (offlineData) {
-        const useCache = confirm(`NRP ${nrp} tidak ditemukan di server. Gunakan data offline yang tersedia?`);
-        if (useCache) {
+        if (confirm(`NRP ${nrp} tidak ditemukan di server. Gunakan data offline?`)) {
           const cached = JSON.parse(offlineData);
           currentNRP = nrp;
           isiFormDenganData(cached);
@@ -837,16 +1042,14 @@ async function loginWithNRP() {
           return true;
         }
       }
-      alert(`NRP ${nrp} tidak ditemukan. Silakan cek kembali atau hubungi admin.`);
+      alert(`NRP ${nrp} tidak ditemukan.`);
       hideLoading();
       loginBtn.disabled = false;
       return false;
     }
-    
     currentNRP = nrp;
     isiFormDenganData(data);
     localStorage.setItem(offlineKey, JSON.stringify(data));
-    
     document.getElementById('loginPanel').style.display = 'none';
     document.getElementById('dataPanel').classList.add('active');
     hideLoading();
@@ -854,23 +1057,19 @@ async function loginWithNRP() {
     return true;
   } catch (err) {
     console.error(err);
-    const offlineKey = "personil_cache_" + nrp;
-    const offlineData = localStorage.getItem(offlineKey);
-    if (offlineData) {
-      const useCache = confirm(`Koneksi bermasalah. Gunakan data offline untuk NRP ${nrp}?`);
-      if (useCache) {
-        const data = JSON.parse(offlineData);
-        currentNRP = nrp;
-        isiFormDenganData(data);
-        document.getElementById('loginPanel').style.display = 'none';
-        document.getElementById('dataPanel').classList.add('active');
-        alert("⚠️ Mode Offline: Menampilkan data terakhir yang tersimpan.");
-        hideLoading();
-        loginBtn.disabled = false;
-        return true;
-      }
+    const offlineData = localStorage.getItem("personil_cache_" + nrp);
+    if (offlineData && confirm(`Koneksi bermasalah. Gunakan data offline?`)) {
+      const data = JSON.parse(offlineData);
+      currentNRP = nrp;
+      isiFormDenganData(data);
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('dataPanel').classList.add('active');
+      alert("⚠️ Mode Offline: Menampilkan data lokal.");
+      hideLoading();
+      loginBtn.disabled = false;
+      return true;
     }
-    alert("Gagal terhubung ke server. Periksa koneksi internet Anda.");
+    alert("Gagal terhubung ke server.");
     hideLoading();
     loginBtn.disabled = false;
     return false;
@@ -887,69 +1086,35 @@ function isiFormDenganData(data) {
   document.getElementById('ttl_istri').value = data.ttl_istri || '';
   document.getElementById('nikah').value = data.nikah || '';
   hitungUmur();
-
-  let anakTbody = document.querySelector('#anakTable tbody');
-  anakTbody.innerHTML = '';
-  let pangkatTbody = document.querySelector('#pangkatTable tbody');
-  pangkatTbody.innerHTML = '';
-  let jabatanTbody = document.querySelector('#jabatanTable tbody');
-  jabatanTbody.innerHTML = '';
-
-  if (data.anak && data.anak.length) {
-    data.anak.forEach((an, idx) => {
-      let row = anakTbody.insertRow();
-      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(an[0])}"></td><td><input value="${escapeHtml(an[1])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-    });
-  } else { tambahAnak(); }
   
-  if (data.pangkat_list && data.pangkat_list.length) {
-    data.pangkat_list.forEach((p, idx) => {
-      let row = pangkatTbody.insertRow();
-      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(p[0])}"></td><td><input value="${escapeHtml(p[1])}"></td><td><input value="${escapeHtml(p[2])}"></td><td><input value="${escapeHtml(p[3])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-    });
-  } else { tambahPangkat(); }
+  anakData = data.anak && Array.isArray(data.anak) ? data.anak.map(a => [a[0]||'', a[1]||'']) : [];
+  pangkatData = data.pangkat_list && Array.isArray(data.pangkat_list) ? data.pangkat_list.map(p => [p[0]||'', p[1]||'', p[2]||'', p[3]||'']) : [];
+  jabatanData = data.jabatan_list && Array.isArray(data.jabatan_list) ? data.jabatan_list.map(j => [j[0]||'', j[1]||'', j[2]||'', j[3]||'']) : [];
   
-  if (data.jabatan_list && data.jabatan_list.length) {
-    data.jabatan_list.forEach((j, idx) => {
-      let row = jabatanTbody.insertRow();
-      row.innerHTML = `<td>${idx+1}</td><td><input value="${escapeHtml(j[0])}"></td><td><input value="${escapeHtml(j[1])}"></td><td><input value="${escapeHtml(j[2])}"></td><td><input value="${escapeHtml(j[3])}"></td><td><button onclick="hapusBaris(this)" class="btn-danger">Hapus</button></td>`;
-    });
-  } else { tambahJabatan(); }
+  renderAnak();
+  renderPangkat();
+  renderJabatan();
 }
 
 async function simpanData() {
-  if (!currentNRP) {
-    alert("Sesi habis, silakan login ulang");
-    logout();
-    return;
-  }
+  if (!currentNRP) { alert("Sesi habis, login ulang"); logout(); return; }
   if (!document.getElementById('nama').value || !document.getElementById('pangkat').value) {
-    alert("Nama dan Pangkat/NRP wajib diisi");
-    return;
+    alert("Nama dan Pangkat/NRP wajib diisi"); return;
   }
-  
   const pangkatValue = document.getElementById('pangkat').value;
   const nrpFromPangkat = extractNRPFromPangkat(pangkatValue);
-  
   if (nrpFromPangkat && nrpFromPangkat !== currentNRP) {
-    const konfirmasi = confirm(`Perhatian! NRP dalam pangkat (${nrpFromPangkat}) berbeda dengan NRP login (${currentNRP}).\n\nApakah Anda yakin ingin menyimpan dengan NRP yang berbeda?`);
-    if (!konfirmasi) return;
+    if (!confirm(`Perhatian! NRP dalam pangkat (${nrpFromPangkat}) berbeda dengan NRP login (${currentNRP}). Lanjutkan?`)) return;
     currentNRP = nrpFromPangkat;
   }
-  
   let isUpdate = false;
   if (isOnline) {
     try {
       const checkResponse = await fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentNRP)}`);
       const checkData = await checkResponse.json();
       isUpdate = !checkData.error;
-    } catch(e) {
-      isUpdate = false;
-    }
-  } else {
-    isUpdate = nrpExists;
-  }
-  
+    } catch(e) { isUpdate = false; }
+  } else { isUpdate = nrpExists; }
   const payload = {
     nama: document.getElementById('nama').value,
     pangkat: pangkatValue,
@@ -961,60 +1126,39 @@ async function simpanData() {
     ttl_istri: document.getElementById('ttl_istri').value,
     umur_istri: hitungUmurDariString(document.getElementById('ttl_istri').value),
     nikah: document.getElementById('nikah').value,
-    anak: ambilDataTable('anakTable'),
-    pangkat_list: ambilDataTable('pangkatTable'),
-    jabatan_list: ambilDataTable('jabatanTable')
+    anak: anakData,
+    pangkat_list: pangkatData,
+    jabatan_list: jabatanData
   };
-  
   showLoading(isUpdate ? 'Mengganti data...' : 'Menyimpan data baru...');
   const simpanBtn = document.getElementById('simpanBtn');
   simpanBtn.disabled = true;
-  
   const offlineKey = "personil_cache_" + currentNRP;
   localStorage.setItem(offlineKey, JSON.stringify(payload));
-  
   if (!isOnline) {
     saveToLocalStorage(payload);
     hideLoading();
     simpanBtn.disabled = false;
-    alert("⚠️ Mode Offline: Data disimpan secara lokal. Akan disinkronkan saat koneksi kembali.");
+    alert("⚠️ Offline: Data disimpan lokal, akan sinkron nanti.");
     return;
   }
-  
   try {
-    await fetch(WEB_APP_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    await fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     clearPendingSave();
     hideLoading();
     simpanBtn.disabled = false;
-    
-    if (isUpdate) {
-      alert("✅ Data berhasil DIGANTI/UPDATE!");
-    } else {
-      alert("✅ Data berhasil DISIMPAN sebagai data baru!");
-    }
-    
-    const cached = localStorage.getItem(CHECKED_NRPS_KEY);
-    const nrpCache = cached ? JSON.parse(cached) : {};
-    nrpCache[currentNRP] = true;
-    localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(nrpCache));
+    alert(isUpdate ? "✅ Data berhasil DIGANTI/UPDATE!" : "✅ Data berhasil DISIMPAN!");
+    const cached = JSON.parse(localStorage.getItem(CHECKED_NRPS_KEY) || '{}');
+    cached[currentNRP] = true;
+    localStorage.setItem(CHECKED_NRPS_KEY, JSON.stringify(cached));
     nrpExists = true;
-    
     const nrpInfo = document.getElementById('nrpInfo');
-    if (nrpInfo) {
-      nrpInfo.innerHTML = '✅ Data telah tersimpan. Perubahan selanjutnya akan mengganti data yang sama.';
-      nrpInfo.style.color = '#10b981';
-    }
-    
+    if (nrpInfo) nrpInfo.innerHTML = '✅ Data telah tersimpan. Perubahan selanjutnya akan mengganti data yang sama.';
   } catch(e) {
     saveToLocalStorage(payload);
     hideLoading();
     simpanBtn.disabled = false;
-    alert("⚠️ Gagal terhubung ke server. Data disimpan secara lokal dan akan disinkronkan saat koneksi kembali.");
+    alert("⚠️ Gagal konek server, data disimpan lokal.");
   }
 }
 
@@ -1026,26 +1170,23 @@ function cetakForm() {
     for(let i=0;i<tbody.rows.length;i++) {
       let cells = tbody.rows[i].cells;
       for(let j=1;j<cells.length-1;j++) {
-        let inp = cells[j].querySelector('input');
-        if(inp) cells[j].setAttribute('data-value', inp.value || '-');
+        let span = cells[j].querySelector('span');
+        if(span) cells[j].setAttribute('data-value', span.innerText || '-');
       }
     }
   });
-  
   let rows = ['nama','pangkat','jabatan','ttl','alamat','istri','ttl_istri','nikah'];
   rows.forEach(id => {
     let el = document.getElementById(id);
-    if(el && el.parentElement) {
-      el.parentElement.setAttribute('data-value', el.value || '-');
-    }
+    if(el && el.parentElement) el.parentElement.setAttribute('data-value', el.value || '-');
   });
-  
   window.print();
 }
 
 function logout() {
   currentNRP = null;
   nrpExists = false;
+  anakData = []; pangkatData = []; jabatanData = [];
   document.getElementById('loginPanel').style.display = 'block';
   document.getElementById('dataPanel').classList.remove('active');
   document.getElementById('nrpInput').value = '';
@@ -1058,15 +1199,9 @@ function logout() {
   document.getElementById('ttl_istri').value = '';
   document.getElementById('nikah').value = '';
   document.getElementById('umur').innerText = '0 th 0 bl 0 hr';
-  
-  document.querySelector('#anakTable tbody').innerHTML = '';
-  document.querySelector('#pangkatTable tbody').innerHTML = '';
-  document.querySelector('#jabatanTable tbody').innerHTML = '';
-  
-  tambahAnak();
-  tambahPangkat();
-  tambahJabatan();
-  
+  renderAnak();
+  renderPangkat();
+  renderJabatan();
   const checkSpan = document.getElementById('nrpCheckStatus');
   if (checkSpan) checkSpan.innerHTML = '';
   const nrpInfo = document.getElementById('nrpInfo');
@@ -1083,26 +1218,25 @@ function escapeHtml(str) {
   });
 }
 
+// Event listeners
 document.getElementById('loginBtn').addEventListener('click', loginWithNRP);
-document.getElementById('nrpInput').addEventListener('keypress', function(e) {
-  if(e.key === 'Enter') loginWithNRP();
-});
+document.getElementById('nrpInput').addEventListener('keypress', e => { if(e.key === 'Enter') loginWithNRP(); });
+document.getElementById('tambahAnakBtn').addEventListener('click', tambahAnak);
+document.getElementById('tambahPangkatBtn').addEventListener('click', tambahPangkat);
+document.getElementById('tambahJabatanBtn').addEventListener('click', tambahJabatan);
+document.getElementById('modalSimpanBtn').addEventListener('click', simpanModal);
 
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dataPanel').classList.remove('active');
   document.getElementById('loginPanel').style.display = 'block';
-  tambahAnak();
-  tambahPangkat();
-  tambahJabatan();
+  renderAnak();
+  renderPangkat();
+  renderJabatan();
 });
 
-// ========== REGISTER SERVICE WORKER ==========
+// Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(function(registration) {
-    console.log('Service Worker registered with scope:', registration.scope);
-  }).catch(function(error) {
-    console.log('Service Worker registration failed:', error);
-  });
+  navigator.serviceWorker.register('sw.js').catch(e => console.log('SW gagal:', e));
 }
 </script>
 </body>
