@@ -316,6 +316,13 @@
   .btn-logout {
     background: #475569;
   }
+  .btn-edit-personil {
+    background: #f59e0b;
+    margin-bottom: 16px;
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+  }
 
   /* Modal Popup */
   .modal-overlay {
@@ -535,6 +542,9 @@
     </div>
 
     <div id="dataPanel" class="form-section">
+      <!-- Tombol untuk membuka modal edit data personil -->
+      <button class="btn-edit-personil" id="btnEditPersonil">✏️ Edit Data Personil (Modal Popup)</button>
+
       <div class="row">
         <div class="label">Nama</div>
         <div class="value"><input id="nama" placeholder="Nama lengkap"></div>
@@ -560,21 +570,22 @@
 
       <b>A. DATA ANAK</b>
       <table id="anakTable">
-        <thead><tr><th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th></tr></thead>
+        <thead> Pagbu<th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th> </tr>
+        </thead>
         <tbody></tbody>
       </table>
       <button id="tambahAnakBtn">+ Tambah Anak</button><br><br>
 
       <b>B. RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
-        <thead><tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <thead> <tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> </thead>
         <tbody></tbody>
       </table>
       <button id="tambahPangkatBtn">+ Tambah Pangkat</button><br><br>
 
       <b>C. RIWAYAT JABATAN</b>
       <table id="jabatanTable">
-        <thead><tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <thead> <tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> </thead>
         <tbody></tbody>
       </table>
       <button id="tambahJabatanBtn">+ Tambah Jabatan</button>
@@ -588,19 +599,65 @@
   </div>
 </div>
 
-<!-- Modal Popup -->
+<!-- Modal untuk Anak, Pangkat, Jabatan (sudah ada) -->
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal-container">
     <div class="modal-header">
       <h3 id="modalTitle">Tambah Data</h3>
       <span class="modal-close" onclick="closeModal()">&times;</span>
     </div>
-    <div class="modal-body" id="modalBody">
-      <!-- Dinamis diisi JS -->
-    </div>
+    <div class="modal-body" id="modalBody"></div>
     <div class="modal-footer">
       <button class="btn-modal-batal" onclick="closeModal()">Batal</button>
       <button class="btn-modal-simpan" id="modalSimpanBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal baru untuk Edit Data Personil Utama -->
+<div id="modalPersonilOverlay" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>Edit Data Personil</h3>
+      <span class="modal-close" onclick="closeModalPersonil()">&times;</span>
+    </div>
+    <div class="modal-body" id="modalPersonilBody">
+      <div class="input-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="modal_nama" placeholder="Nama lengkap">
+      </div>
+      <div class="input-group">
+        <label>Pangkat / NRP</label>
+        <input type="text" id="modal_pangkat" placeholder="Serka/310300">
+      </div>
+      <div class="input-group">
+        <label>Jabatan</label>
+        <input type="text" id="modal_jabatan" placeholder="Babinsa...">
+      </div>
+      <div class="input-group">
+        <label>TTL Personel</label>
+        <input type="text" id="modal_ttl" placeholder="Kota, DD-MM-YYYY">
+      </div>
+      <div class="input-group">
+        <label>Alamat</label>
+        <input type="text" id="modal_alamat" placeholder="Alamat">
+      </div>
+      <div class="input-group">
+        <label>Nama Istri</label>
+        <input type="text" id="modal_istri" placeholder="Nama Istri">
+      </div>
+      <div class="input-group">
+        <label>TTL Istri</label>
+        <input type="text" id="modal_ttl_istri" placeholder="Kota, DD-MM-YYYY">
+      </div>
+      <div class="input-group">
+        <label>Akta Nikah</label>
+        <input type="text" id="modal_nikah" placeholder="Nomor Akta Nikah">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-batal" onclick="closeModalPersonil()">Batal</button>
+      <button class="btn-modal-simpan" id="modalPersonilSimpanBtn">Simpan</button>
     </div>
   </div>
 </div>
@@ -623,16 +680,14 @@ let isOnline = true;
 let nrpExists = false;
 let lastCheckedNRP = null;
 
-// Modal state
+// Modal state untuk tabel
 let currentModalType = null;   // 'anak', 'pangkat', 'jabatan'
 let currentEditIndex = -1;      // -1 untuk tambah baru
 
-// ========== FUNGSI PENGURUTAN BERDASARKAN TMT (TERTUA -> TERBARU) ==========
+// ========== FUNGSI PENGURUTAN BERDASARKAN TMT ==========
 function parseTMTToDate(tmtString) {
     if (!tmtString || typeof tmtString !== 'string') return new Date(0);
-    // Format TMT yang diharapkan: DD-MM-YYYY atau bisa juga dengan spasi
     let cleanTMT = tmtString.trim();
-    // Coba format DD-MM-YYYY
     let parts = cleanTMT.split('-');
     if (parts.length === 3) {
         let day = parseInt(parts[0], 10);
@@ -642,7 +697,6 @@ function parseTMTToDate(tmtString) {
             return new Date(year, month, day);
         }
     }
-    // Coba format YYYY-MM-DD
     parts = cleanTMT.split('-');
     if (parts.length === 3 && parts[0].length === 4) {
         let year = parseInt(parts[0], 10);
@@ -657,17 +711,14 @@ function parseTMTToDate(tmtString) {
 
 function sortByTMT(dataArray) {
     return [...dataArray].sort((a, b) => {
-        // Kolom TMT biasanya di index ke-3 (untuk pangkat dan jabatan)
-        // a[3] adalah TMT, b[3] adalah TMT
         const tmtA = a[3] || '';
         const tmtB = b[3] || '';
         const dateA = parseTMTToDate(tmtA);
         const dateB = parseTMTToDate(tmtB);
-        return dateA - dateB; // Urutkan dari tertua ke terbaru
+        return dateA - dateB;
     });
 }
 
-// Fungsi untuk mengurutkan dan merender ulang dengan urutan yang benar
 function sortAndRenderPangkat() {
     pangkatData = sortByTMT(pangkatData);
     renderPangkat();
@@ -734,7 +785,7 @@ function renderJabatan() {
   });
 }
 
-// ========== MODAL POPUP ==========
+// ========== MODAL UNTUK ANAK, PANGKAT, JABATAN ==========
 function openModal(type, index = -1) {
   currentModalType = type;
   currentEditIndex = index;
@@ -774,7 +825,6 @@ function openModal(type, index = -1) {
   }
   modalBody.innerHTML = fieldsHtml;
   
-  // Jika edit, isi nilai yang ada
   if (index !== -1) {
     if (type === 'anak') {
       document.getElementById('modal_nama').value = anakData[index][0] || '';
@@ -791,7 +841,6 @@ function openModal(type, index = -1) {
       document.getElementById('modal_tmt').value = jabatanData[index][3] || '';
     }
   }
-  
   modal.style.display = 'flex';
 }
 
@@ -805,16 +854,10 @@ function simpanModal() {
   if (currentModalType === 'anak') {
     const nama = document.getElementById('modal_nama').value.trim();
     const ttl = document.getElementById('modal_ttl').value.trim();
-    if (!nama) {
-      alert('Nama anak wajib diisi');
-      return;
-    }
+    if (!nama) { alert('Nama anak wajib diisi'); return; }
     const dataBaru = [nama, ttl];
-    if (currentEditIndex === -1) {
-      anakData.push(dataBaru);
-    } else {
-      anakData[currentEditIndex] = dataBaru;
-    }
+    if (currentEditIndex === -1) anakData.push(dataBaru);
+    else anakData[currentEditIndex] = dataBaru;
     renderAnak();
   } 
   else if (currentModalType === 'pangkat') {
@@ -822,17 +865,10 @@ function simpanModal() {
     const nomor = document.getElementById('modal_nomor').value.trim();
     const tgl = document.getElementById('modal_tgl').value.trim();
     const tmt = document.getElementById('modal_tmt').value.trim();
-    if (!pangkatVal) {
-      alert('Pangkat wajib diisi');
-      return;
-    }
+    if (!pangkatVal) { alert('Pangkat wajib diisi'); return; }
     const dataBaru = [pangkatVal, nomor, tgl, tmt];
-    if (currentEditIndex === -1) {
-      pangkatData.push(dataBaru);
-    } else {
-      pangkatData[currentEditIndex] = dataBaru;
-    }
-    // Urutkan berdasarkan TMT
+    if (currentEditIndex === -1) pangkatData.push(dataBaru);
+    else pangkatData[currentEditIndex] = dataBaru;
     sortAndRenderPangkat();
   }
   else if (currentModalType === 'jabatan') {
@@ -840,20 +876,46 @@ function simpanModal() {
     const nomor = document.getElementById('modal_nomor').value.trim();
     const tgl = document.getElementById('modal_tgl').value.trim();
     const tmt = document.getElementById('modal_tmt').value.trim();
-    if (!jabatanVal) {
-      alert('Jabatan wajib diisi');
-      return;
-    }
+    if (!jabatanVal) { alert('Jabatan wajib diisi'); return; }
     const dataBaru = [jabatanVal, nomor, tgl, tmt];
-    if (currentEditIndex === -1) {
-      jabatanData.push(dataBaru);
-    } else {
-      jabatanData[currentEditIndex] = dataBaru;
-    }
-    // Urutkan berdasarkan TMT
+    if (currentEditIndex === -1) jabatanData.push(dataBaru);
+    else jabatanData[currentEditIndex] = dataBaru;
     sortAndRenderJabatan();
   }
   closeModal();
+}
+
+// ========== MODAL UNTUK DATA PERSONIL UTAMA ==========
+function openModalPersonil() {
+  // Isi modal dengan nilai dari input fields utama
+  document.getElementById('modal_nama').value = document.getElementById('nama').value;
+  document.getElementById('modal_pangkat').value = document.getElementById('pangkat').value;
+  document.getElementById('modal_jabatan').value = document.getElementById('jabatan').value;
+  document.getElementById('modal_ttl').value = document.getElementById('ttl').value;
+  document.getElementById('modal_alamat').value = document.getElementById('alamat').value;
+  document.getElementById('modal_istri').value = document.getElementById('istri').value;
+  document.getElementById('modal_ttl_istri').value = document.getElementById('ttl_istri').value;
+  document.getElementById('modal_nikah').value = document.getElementById('nikah').value;
+  document.getElementById('modalPersonilOverlay').style.display = 'flex';
+}
+
+function closeModalPersonil() {
+  document.getElementById('modalPersonilOverlay').style.display = 'none';
+}
+
+function simpanModalPersonil() {
+  // Ambil nilai dari modal dan set ke input utama
+  document.getElementById('nama').value = document.getElementById('modal_nama').value;
+  document.getElementById('pangkat').value = document.getElementById('modal_pangkat').value;
+  document.getElementById('jabatan').value = document.getElementById('modal_jabatan').value;
+  document.getElementById('ttl').value = document.getElementById('modal_ttl').value;
+  document.getElementById('alamat').value = document.getElementById('modal_alamat').value;
+  document.getElementById('istri').value = document.getElementById('modal_istri').value;
+  document.getElementById('ttl_istri').value = document.getElementById('modal_ttl_istri').value;
+  document.getElementById('nikah').value = document.getElementById('modal_nikah').value;
+  // Hitung ulang umur
+  hitungUmur();
+  closeModalPersonil();
 }
 
 // ========== CRUD FUNCTIONS ==========
@@ -882,7 +944,7 @@ function hapusJabatan(idx) {
   }
 }
 
-// ========== CEK DUPLIKASI NRP (SAMA) ==========
+// ========== CEK NRP ==========
 async function checkNRPExists(nrp) {
   if (!nrp || nrp === lastCheckedNRP) return nrpExists;
   lastCheckedNRP = nrp;
@@ -986,6 +1048,7 @@ document.getElementById('pangkat').addEventListener('input', function(e) {
   }
 });
 
+// ========== ONLINE/OFFLINE ==========
 function updateStatusBadge() {
   const badge = document.getElementById('statusBadge');
   if (isOnline) {
@@ -1145,7 +1208,6 @@ function isiFormDenganData(data) {
   pangkatData = data.pangkat_list && Array.isArray(data.pangkat_list) ? data.pangkat_list.map(p => [p[0]||'', p[1]||'', p[2]||'', p[3]||'']) : [];
   jabatanData = data.jabatan_list && Array.isArray(data.jabatan_list) ? data.jabatan_list.map(j => [j[0]||'', j[1]||'', j[2]||'', j[3]||'']) : [];
   
-  // Urutkan data setelah dimuat
   pangkatData = sortByTMT(pangkatData);
   jabatanData = sortByTMT(jabatanData);
   
@@ -1283,6 +1345,8 @@ document.getElementById('tambahAnakBtn').addEventListener('click', tambahAnak);
 document.getElementById('tambahPangkatBtn').addEventListener('click', tambahPangkat);
 document.getElementById('tambahJabatanBtn').addEventListener('click', tambahJabatan);
 document.getElementById('modalSimpanBtn').addEventListener('click', simpanModal);
+document.getElementById('btnEditPersonil').addEventListener('click', openModalPersonil);
+document.getElementById('modalPersonilSimpanBtn').addEventListener('click', simpanModalPersonil);
 
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dataPanel').classList.remove('active');
