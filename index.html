@@ -570,25 +570,38 @@
 
       <b>A. DATA ANAK</b>
       <table id="anakTable">
-        <thead><th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th> </tr>
-        </thead>
+        <thead><tr><th>No</th><th>Nama</th><th>TTL Anak</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
       <button id="tambahAnakBtn">+ Tambah Anak</button><br><br>
 
       <b>B. RIWAYAT PANGKAT</b>
       <table id="pangkatTable">
-        <thead> <tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> </thead>
+        <thead><tr><th>No</th><th>Pangkat</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
       <button id="tambahPangkatBtn">+ Tambah Pangkat</button><br><br>
 
       <b>C. RIWAYAT JABATAN</b>
       <table id="jabatanTable">
-        <thead> <tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr> </thead>
+        <thead><tr><th>No</th><th>Jabatan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
-      <button id="tambahJabatanBtn">+ Tambah Jabatan</button>
+      <button id="tambahJabatanBtn">+ Tambah Jabatan</button><br><br>
+
+      <b>D. RIWAYAT PENUGASAN</b>
+      <table id="penugasanTable">
+        <thead><tr><th>No</th><th>Penugasan</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button id="tambahPenugasanBtn">+ Tambah Penugasan</button><br><br>
+
+      <b>E. RIWAYAT TANDA JASA</b>
+      <table id="tandaJasaTable">
+        <thead><tr><th>No</th><th>Tanda Jasa</th><th>Nomor Sprin/Skep</th><th>Tgl</th><th>TMT</th><th>Aksi</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button id="tambahTandaJasaBtn">+ Tambah Tanda Jasa</button>
 
       <div class="action-buttons">
         <button id="simpanBtn" onclick="simpanData()">💾 SIMPAN</button>
@@ -599,7 +612,7 @@
   </div>
 </div>
 
-<!-- Modal untuk Anak, Pangkat, Jabatan (sudah ada) -->
+<!-- Modal untuk Anak, Pangkat, Jabatan, Penugasan, Tanda Jasa -->
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal-container">
     <div class="modal-header">
@@ -614,7 +627,7 @@
   </div>
 </div>
 
-<!-- Modal baru untuk Edit Data Personil Utama -->
+<!-- Modal untuk Edit Data Personil Utama -->
 <div id="modalPersonilOverlay" class="modal-overlay">
   <div class="modal-container">
     <div class="modal-header">
@@ -673,6 +686,8 @@ const CHECKED_NRPS_KEY = "checked_nrps";
 let anakData = [];
 let pangkatData = [];
 let jabatanData = [];
+let penugasanData = [];
+let tandaJasaData = [];
 
 // ========== GLOBAL ==========
 let currentNRP = null;
@@ -681,8 +696,8 @@ let nrpExists = false;
 let lastCheckedNRP = null;
 
 // Modal state untuk tabel
-let currentModalType = null;   // 'anak', 'pangkat', 'jabatan'
-let currentEditIndex = -1;      // -1 untuk tambah baru
+let currentModalType = null;   // 'anak', 'pangkat', 'jabatan', 'penugasan', 'tandaJasa'
+let currentEditIndex = -1;
 
 // ========== FUNGSI PENGURUTAN BERDASARKAN TMT ==========
 function parseTMTToDate(tmtString) {
@@ -723,10 +738,17 @@ function sortAndRenderPangkat() {
     pangkatData = sortByTMT(pangkatData);
     renderPangkat();
 }
-
 function sortAndRenderJabatan() {
     jabatanData = sortByTMT(jabatanData);
     renderJabatan();
+}
+function sortAndRenderPenugasan() {
+    penugasanData = sortByTMT(penugasanData);
+    renderPenugasan();
+}
+function sortAndRenderTandaJasa() {
+    tandaJasaData = sortByTMT(tandaJasaData);
+    renderTandaJasa();
 }
 
 // ========== FUNGSI RENDER TABEL ==========
@@ -736,13 +758,13 @@ function renderAnak() {
   anakData.forEach((item, idx) => {
     let row = tbody.insertRow();
     row.innerHTML = `
-      <td>${idx+1}</td>
-      <td><span>${escapeHtml(item[0] || '')}</span></td>
-      <td><span>${escapeHtml(item[1] || '')}</span></td>
-      <td>
-        <button class="btn-edit" onclick="editAnak(${idx})">✏️</button>
-        <button class="btn-hapus" onclick="hapusAnak(${idx})">🗑️</button>
-      </td>
+        <td>${idx+1}</td>
+        <td><span>${escapeHtml(item[0] || '')}</span></td>
+        <td><span>${escapeHtml(item[1] || '')}</span></td>
+        <td>
+          <button class="btn-edit" onclick="editAnak(${idx})">✏️</button>
+          <button class="btn-hapus" onclick="hapusAnak(${idx})">🗑️</button>
+        </td>
     `;
   });
 }
@@ -753,15 +775,15 @@ function renderPangkat() {
   pangkatData.forEach((item, idx) => {
     let row = tbody.insertRow();
     row.innerHTML = `
-      <td>${idx+1}</td>
-      <td><span>${escapeHtml(item[0] || '')}</span></td>
-      <td><span>${escapeHtml(item[1] || '')}</span></td>
-      <td><span>${escapeHtml(item[2] || '')}</span></td>
-      <td><span>${escapeHtml(item[3] || '')}</span></td>
-      <td>
-        <button class="btn-edit" onclick="editPangkat(${idx})">✏️</button>
-        <button class="btn-hapus" onclick="hapusPangkat(${idx})">🗑️</button>
-      </td>
+        <td>${idx+1}</td>
+        <td><span>${escapeHtml(item[0] || '')}</span></td>
+        <td><span>${escapeHtml(item[1] || '')}</span></td>
+        <td><span>${escapeHtml(item[2] || '')}</span></td>
+        <td><span>${escapeHtml(item[3] || '')}</span></td>
+        <td>
+          <button class="btn-edit" onclick="editPangkat(${idx})">✏️</button>
+          <button class="btn-hapus" onclick="hapusPangkat(${idx})">🗑️</button>
+        </td>
     `;
   });
 }
@@ -772,20 +794,58 @@ function renderJabatan() {
   jabatanData.forEach((item, idx) => {
     let row = tbody.insertRow();
     row.innerHTML = `
-      <td>${idx+1}</td>
-      <td><span>${escapeHtml(item[0] || '')}</span></td>
-      <td><span>${escapeHtml(item[1] || '')}</span></td>
-      <td><span>${escapeHtml(item[2] || '')}</span></td>
-      <td><span>${escapeHtml(item[3] || '')}</span></td>
-      <td>
-        <button class="btn-edit" onclick="editJabatan(${idx})">✏️</button>
-        <button class="btn-hapus" onclick="hapusJabatan(${idx})">🗑️</button>
-      </td>
+        <td>${idx+1}</td>
+        <td><span>${escapeHtml(item[0] || '')}</span></td>
+        <td><span>${escapeHtml(item[1] || '')}</span></td>
+        <td><span>${escapeHtml(item[2] || '')}</span></td>
+        <td><span>${escapeHtml(item[3] || '')}</span></td>
+        <td>
+          <button class="btn-edit" onclick="editJabatan(${idx})">✏️</button>
+          <button class="btn-hapus" onclick="hapusJabatan(${idx})">🗑️</button>
+        </td>
     `;
   });
 }
 
-// ========== MODAL UNTUK ANAK, PANGKAT, JABATAN ==========
+function renderPenugasan() {
+  let tbody = document.querySelector('#penugasanTable tbody');
+  tbody.innerHTML = '';
+  penugasanData.forEach((item, idx) => {
+    let row = tbody.insertRow();
+    row.innerHTML = `
+        <td>${idx+1}</td>
+        <td><span>${escapeHtml(item[0] || '')}</span></td>
+        <td><span>${escapeHtml(item[1] || '')}</span></td>
+        <td><span>${escapeHtml(item[2] || '')}</span></td>
+        <td><span>${escapeHtml(item[3] || '')}</span></td>
+        <td>
+          <button class="btn-edit" onclick="editPenugasan(${idx})">✏️</button>
+          <button class="btn-hapus" onclick="hapusPenugasan(${idx})">🗑️</button>
+        </td>
+    `;
+  });
+}
+
+function renderTandaJasa() {
+  let tbody = document.querySelector('#tandaJasaTable tbody');
+  tbody.innerHTML = '';
+  tandaJasaData.forEach((item, idx) => {
+    let row = tbody.insertRow();
+    row.innerHTML = `
+        <td>${idx+1}</td>
+        <td><span>${escapeHtml(item[0] || '')}</span></td>
+        <td><span>${escapeHtml(item[1] || '')}</span></td>
+        <td><span>${escapeHtml(item[2] || '')}</span></td>
+        <td><span>${escapeHtml(item[3] || '')}</span></td>
+        <td>
+          <button class="btn-edit" onclick="editTandaJasa(${idx})">✏️</button>
+          <button class="btn-hapus" onclick="hapusTandaJasa(${idx})">🗑️</button>
+        </td>
+    `;
+  });
+}
+
+// ========== MODAL UNTUK TABEL ==========
 function openModal(type, index = -1) {
   currentModalType = type;
   currentEditIndex = index;
@@ -797,14 +857,8 @@ function openModal(type, index = -1) {
   if (type === 'anak') {
     modalTitle.innerText = index === -1 ? 'Tambah Anak' : 'Edit Anak';
     fieldsHtml = `
-      <div class="input-group">
-        <label>Nama Anak</label>
-        <input type="text" id="modal_nama" placeholder="Nama lengkap anak">
-      </div>
-      <div class="input-group">
-        <label>TTL Anak</label>
-        <input type="text" id="modal_ttl" placeholder="Kota, DD-MM-YYYY">
-      </div>
+      <div class="input-group"><label>Nama Anak</label><input type="text" id="modal_nama" placeholder="Nama lengkap anak"></div>
+      <div class="input-group"><label>TTL Anak</label><input type="text" id="modal_ttl" placeholder="Kota, DD-MM-YYYY"></div>
     `;
   } else if (type === 'pangkat') {
     modalTitle.innerText = index === -1 ? 'Tambah Riwayat Pangkat' : 'Edit Riwayat Pangkat';
@@ -818,6 +872,22 @@ function openModal(type, index = -1) {
     modalTitle.innerText = index === -1 ? 'Tambah Riwayat Jabatan' : 'Edit Riwayat Jabatan';
     fieldsHtml = `
       <div class="input-group"><label>Jabatan</label><input type="text" id="modal_jabatan" placeholder="Jabatan"></div>
+      <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
+      <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT (DD-MM-YYYY)"></div>
+    `;
+  } else if (type === 'penugasan') {
+    modalTitle.innerText = index === -1 ? 'Tambah Riwayat Penugasan' : 'Edit Riwayat Penugasan';
+    fieldsHtml = `
+      <div class="input-group"><label>Penugasan</label><input type="text" id="modal_penugasan" placeholder="Nama Penugasan"></div>
+      <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
+      <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT (DD-MM-YYYY)"></div>
+    `;
+  } else if (type === 'tandaJasa') {
+    modalTitle.innerText = index === -1 ? 'Tambah Riwayat Tanda Jasa' : 'Edit Riwayat Tanda Jasa';
+    fieldsHtml = `
+      <div class="input-group"><label>Tanda Jasa</label><input type="text" id="modal_tandaJasa" placeholder="Nama Tanda Jasa"></div>
       <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
       <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
       <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT (DD-MM-YYYY)"></div>
@@ -839,6 +909,16 @@ function openModal(type, index = -1) {
       document.getElementById('modal_nomor').value = jabatanData[index][1] || '';
       document.getElementById('modal_tgl').value = jabatanData[index][2] || '';
       document.getElementById('modal_tmt').value = jabatanData[index][3] || '';
+    } else if (type === 'penugasan') {
+      document.getElementById('modal_penugasan').value = penugasanData[index][0] || '';
+      document.getElementById('modal_nomor').value = penugasanData[index][1] || '';
+      document.getElementById('modal_tgl').value = penugasanData[index][2] || '';
+      document.getElementById('modal_tmt').value = penugasanData[index][3] || '';
+    } else if (type === 'tandaJasa') {
+      document.getElementById('modal_tandaJasa').value = tandaJasaData[index][0] || '';
+      document.getElementById('modal_nomor').value = tandaJasaData[index][1] || '';
+      document.getElementById('modal_tgl').value = tandaJasaData[index][2] || '';
+      document.getElementById('modal_tmt').value = tandaJasaData[index][3] || '';
     }
   }
   modal.style.display = 'flex';
@@ -882,40 +962,29 @@ function simpanModal() {
     else jabatanData[currentEditIndex] = dataBaru;
     sortAndRenderJabatan();
   }
+  else if (currentModalType === 'penugasan') {
+    const penugasanVal = document.getElementById('modal_penugasan').value.trim();
+    const nomor = document.getElementById('modal_nomor').value.trim();
+    const tgl = document.getElementById('modal_tgl').value.trim();
+    const tmt = document.getElementById('modal_tmt').value.trim();
+    if (!penugasanVal) { alert('Penugasan wajib diisi'); return; }
+    const dataBaru = [penugasanVal, nomor, tgl, tmt];
+    if (currentEditIndex === -1) penugasanData.push(dataBaru);
+    else penugasanData[currentEditIndex] = dataBaru;
+    sortAndRenderPenugasan();
+  }
+  else if (currentModalType === 'tandaJasa') {
+    const tandaJasaVal = document.getElementById('modal_tandaJasa').value.trim();
+    const nomor = document.getElementById('modal_nomor').value.trim();
+    const tgl = document.getElementById('modal_tgl').value.trim();
+    const tmt = document.getElementById('modal_tmt').value.trim();
+    if (!tandaJasaVal) { alert('Tanda Jasa wajib diisi'); return; }
+    const dataBaru = [tandaJasaVal, nomor, tgl, tmt];
+    if (currentEditIndex === -1) tandaJasaData.push(dataBaru);
+    else tandaJasaData[currentEditIndex] = dataBaru;
+    sortAndRenderTandaJasa();
+  }
   closeModal();
-}
-
-// ========== MODAL UNTUK DATA PERSONIL UTAMA ==========
-function openModalPersonil() {
-  // Isi modal dengan nilai dari input fields utama
-  document.getElementById('modal_nama').value = document.getElementById('nama').value;
-  document.getElementById('modal_pangkat').value = document.getElementById('pangkat').value;
-  document.getElementById('modal_jabatan').value = document.getElementById('jabatan').value;
-  document.getElementById('modal_ttl').value = document.getElementById('ttl').value;
-  document.getElementById('modal_alamat').value = document.getElementById('alamat').value;
-  document.getElementById('modal_istri').value = document.getElementById('istri').value;
-  document.getElementById('modal_ttl_istri').value = document.getElementById('ttl_istri').value;
-  document.getElementById('modal_nikah').value = document.getElementById('nikah').value;
-  document.getElementById('modalPersonilOverlay').style.display = 'flex';
-}
-
-function closeModalPersonil() {
-  document.getElementById('modalPersonilOverlay').style.display = 'none';
-}
-
-function simpanModalPersonil() {
-  // Ambil nilai dari modal dan set ke input utama
-  document.getElementById('nama').value = document.getElementById('modal_nama').value;
-  document.getElementById('pangkat').value = document.getElementById('modal_pangkat').value;
-  document.getElementById('jabatan').value = document.getElementById('modal_jabatan').value;
-  document.getElementById('ttl').value = document.getElementById('modal_ttl').value;
-  document.getElementById('alamat').value = document.getElementById('modal_alamat').value;
-  document.getElementById('istri').value = document.getElementById('modal_istri').value;
-  document.getElementById('ttl_istri').value = document.getElementById('modal_ttl_istri').value;
-  document.getElementById('nikah').value = document.getElementById('modal_nikah').value;
-  // Hitung ulang umur
-  hitungUmur();
-  closeModalPersonil();
 }
 
 // ========== CRUD FUNCTIONS ==========
@@ -943,8 +1012,52 @@ function hapusJabatan(idx) {
     sortAndRenderJabatan();
   }
 }
+function tambahPenugasan() { openModal('penugasan', -1); }
+function editPenugasan(idx) { openModal('penugasan', idx); }
+function hapusPenugasan(idx) {
+  if (confirm('Hapus riwayat penugasan ini?')) {
+    penugasanData.splice(idx, 1);
+    sortAndRenderPenugasan();
+  }
+}
+function tambahTandaJasa() { openModal('tandaJasa', -1); }
+function editTandaJasa(idx) { openModal('tandaJasa', idx); }
+function hapusTandaJasa(idx) {
+  if (confirm('Hapus riwayat tanda jasa ini?')) {
+    tandaJasaData.splice(idx, 1);
+    sortAndRenderTandaJasa();
+  }
+}
 
-// ========== CEK NRP ==========
+// ========== MODAL PERSONIL ==========
+function openModalPersonil() {
+  document.getElementById('modal_nama').value = document.getElementById('nama').value;
+  document.getElementById('modal_pangkat').value = document.getElementById('pangkat').value;
+  document.getElementById('modal_jabatan').value = document.getElementById('jabatan').value;
+  document.getElementById('modal_ttl').value = document.getElementById('ttl').value;
+  document.getElementById('modal_alamat').value = document.getElementById('alamat').value;
+  document.getElementById('modal_istri').value = document.getElementById('istri').value;
+  document.getElementById('modal_ttl_istri').value = document.getElementById('ttl_istri').value;
+  document.getElementById('modal_nikah').value = document.getElementById('nikah').value;
+  document.getElementById('modalPersonilOverlay').style.display = 'flex';
+}
+function closeModalPersonil() {
+  document.getElementById('modalPersonilOverlay').style.display = 'none';
+}
+function simpanModalPersonil() {
+  document.getElementById('nama').value = document.getElementById('modal_nama').value;
+  document.getElementById('pangkat').value = document.getElementById('modal_pangkat').value;
+  document.getElementById('jabatan').value = document.getElementById('modal_jabatan').value;
+  document.getElementById('ttl').value = document.getElementById('modal_ttl').value;
+  document.getElementById('alamat').value = document.getElementById('modal_alamat').value;
+  document.getElementById('istri').value = document.getElementById('modal_istri').value;
+  document.getElementById('ttl_istri').value = document.getElementById('modal_ttl_istri').value;
+  document.getElementById('nikah').value = document.getElementById('modal_nikah').value;
+  hitungUmur();
+  closeModalPersonil();
+}
+
+// ========== CEK NRP, ONLINE/OFFLINE, DLL (tidak diubah) ==========
 async function checkNRPExists(nrp) {
   if (!nrp || nrp === lastCheckedNRP) return nrpExists;
   lastCheckedNRP = nrp;
@@ -1048,7 +1161,6 @@ document.getElementById('pangkat').addEventListener('input', function(e) {
   }
 });
 
-// ========== ONLINE/OFFLINE ==========
 function updateStatusBadge() {
   const badge = document.getElementById('statusBadge');
   if (isOnline) {
@@ -1207,13 +1319,19 @@ function isiFormDenganData(data) {
   anakData = data.anak && Array.isArray(data.anak) ? data.anak.map(a => [a[0]||'', a[1]||'']) : [];
   pangkatData = data.pangkat_list && Array.isArray(data.pangkat_list) ? data.pangkat_list.map(p => [p[0]||'', p[1]||'', p[2]||'', p[3]||'']) : [];
   jabatanData = data.jabatan_list && Array.isArray(data.jabatan_list) ? data.jabatan_list.map(j => [j[0]||'', j[1]||'', j[2]||'', j[3]||'']) : [];
+  penugasanData = data.penugasan_list && Array.isArray(data.penugasan_list) ? data.penugasan_list.map(p => [p[0]||'', p[1]||'', p[2]||'', p[3]||'']) : [];
+  tandaJasaData = data.tanda_jasa_list && Array.isArray(data.tanda_jasa_list) ? data.tanda_jasa_list.map(t => [t[0]||'', t[1]||'', t[2]||'', t[3]||'']) : [];
   
   pangkatData = sortByTMT(pangkatData);
   jabatanData = sortByTMT(jabatanData);
+  penugasanData = sortByTMT(penugasanData);
+  tandaJasaData = sortByTMT(tandaJasaData);
   
   renderAnak();
   renderPangkat();
   renderJabatan();
+  renderPenugasan();
+  renderTandaJasa();
 }
 
 async function simpanData() {
@@ -1248,7 +1366,9 @@ async function simpanData() {
     nikah: document.getElementById('nikah').value,
     anak: anakData,
     pangkat_list: pangkatData,
-    jabatan_list: jabatanData
+    jabatan_list: jabatanData,
+    penugasan_list: penugasanData,
+    tanda_jasa_list: tandaJasaData
   };
   showLoading(isUpdate ? 'Mengganti data...' : 'Menyimpan data baru...');
   const simpanBtn = document.getElementById('simpanBtn');
@@ -1283,7 +1403,7 @@ async function simpanData() {
 }
 
 function cetakForm() {
-  let tables = ['anakTable','pangkatTable','jabatanTable'];
+  let tables = ['anakTable','pangkatTable','jabatanTable','penugasanTable','tandaJasaTable'];
   tables.forEach(tid => {
     let tbody = document.querySelector(`#${tid} tbody`);
     if(!tbody) return;
@@ -1306,7 +1426,7 @@ function cetakForm() {
 function logout() {
   currentNRP = null;
   nrpExists = false;
-  anakData = []; pangkatData = []; jabatanData = [];
+  anakData = []; pangkatData = []; jabatanData = []; penugasanData = []; tandaJasaData = [];
   document.getElementById('loginPanel').style.display = 'block';
   document.getElementById('dataPanel').classList.remove('active');
   document.getElementById('nrpInput').value = '';
@@ -1322,6 +1442,8 @@ function logout() {
   renderAnak();
   renderPangkat();
   renderJabatan();
+  renderPenugasan();
+  renderTandaJasa();
   const checkSpan = document.getElementById('nrpCheckStatus');
   if (checkSpan) checkSpan.innerHTML = '';
   const nrpInfo = document.getElementById('nrpInfo');
@@ -1344,6 +1466,8 @@ document.getElementById('nrpInput').addEventListener('keypress', e => { if(e.key
 document.getElementById('tambahAnakBtn').addEventListener('click', tambahAnak);
 document.getElementById('tambahPangkatBtn').addEventListener('click', tambahPangkat);
 document.getElementById('tambahJabatanBtn').addEventListener('click', tambahJabatan);
+document.getElementById('tambahPenugasanBtn').addEventListener('click', tambahPenugasan);
+document.getElementById('tambahTandaJasaBtn').addEventListener('click', tambahTandaJasa);
 document.getElementById('modalSimpanBtn').addEventListener('click', simpanModal);
 document.getElementById('btnEditPersonil').addEventListener('click', openModalPersonil);
 document.getElementById('modalPersonilSimpanBtn').addEventListener('click', simpanModalPersonil);
@@ -1354,6 +1478,8 @@ window.addEventListener('DOMContentLoaded', () => {
   renderAnak();
   renderPangkat();
   renderJabatan();
+  renderPenugasan();
+  renderTandaJasa();
 });
 
 // Service Worker
