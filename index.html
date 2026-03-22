@@ -627,6 +627,57 @@ let lastCheckedNRP = null;
 let currentModalType = null;   // 'anak', 'pangkat', 'jabatan'
 let currentEditIndex = -1;      // -1 untuk tambah baru
 
+// ========== FUNGSI PENGURUTAN BERDASARKAN TMT (TERTUA -> TERBARU) ==========
+function parseTMTToDate(tmtString) {
+    if (!tmtString || typeof tmtString !== 'string') return new Date(0);
+    // Format TMT yang diharapkan: DD-MM-YYYY atau bisa juga dengan spasi
+    let cleanTMT = tmtString.trim();
+    // Coba format DD-MM-YYYY
+    let parts = cleanTMT.split('-');
+    if (parts.length === 3) {
+        let day = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10) - 1;
+        let year = parseInt(parts[2], 10);
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+            return new Date(year, month, day);
+        }
+    }
+    // Coba format YYYY-MM-DD
+    parts = cleanTMT.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        let year = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10) - 1;
+        let day = parseInt(parts[2], 10);
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+            return new Date(year, month, day);
+        }
+    }
+    return new Date(0);
+}
+
+function sortByTMT(dataArray) {
+    return [...dataArray].sort((a, b) => {
+        // Kolom TMT biasanya di index ke-3 (untuk pangkat dan jabatan)
+        // a[3] adalah TMT, b[3] adalah TMT
+        const tmtA = a[3] || '';
+        const tmtB = b[3] || '';
+        const dateA = parseTMTToDate(tmtA);
+        const dateB = parseTMTToDate(tmtB);
+        return dateA - dateB; // Urutkan dari tertua ke terbaru
+    });
+}
+
+// Fungsi untuk mengurutkan dan merender ulang dengan urutan yang benar
+function sortAndRenderPangkat() {
+    pangkatData = sortByTMT(pangkatData);
+    renderPangkat();
+}
+
+function sortAndRenderJabatan() {
+    jabatanData = sortByTMT(jabatanData);
+    renderJabatan();
+}
+
 // ========== FUNGSI RENDER TABEL ==========
 function renderAnak() {
   let tbody = document.querySelector('#anakTable tbody');
@@ -710,7 +761,7 @@ function openModal(type, index = -1) {
       <div class="input-group"><label>Pangkat</label><input type="text" id="modal_pangkat" placeholder="Pangkat"></div>
       <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
       <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
-      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT (DD-MM-YYYY)"></div>
     `;
   } else if (type === 'jabatan') {
     modalTitle.innerText = index === -1 ? 'Tambah Riwayat Jabatan' : 'Edit Riwayat Jabatan';
@@ -718,7 +769,7 @@ function openModal(type, index = -1) {
       <div class="input-group"><label>Jabatan</label><input type="text" id="modal_jabatan" placeholder="Jabatan"></div>
       <div class="input-group"><label>Nomor Sprin/Skep</label><input type="text" id="modal_nomor" placeholder="Nomor Sprin/Skep"></div>
       <div class="input-group"><label>Tgl</label><input type="text" id="modal_tgl" placeholder="DD-MM-YYYY"></div>
-      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT"></div>
+      <div class="input-group"><label>TMT</label><input type="text" id="modal_tmt" placeholder="TMT (DD-MM-YYYY)"></div>
     `;
   }
   modalBody.innerHTML = fieldsHtml;
@@ -781,7 +832,8 @@ function simpanModal() {
     } else {
       pangkatData[currentEditIndex] = dataBaru;
     }
-    renderPangkat();
+    // Urutkan berdasarkan TMT
+    sortAndRenderPangkat();
   }
   else if (currentModalType === 'jabatan') {
     const jabatanVal = document.getElementById('modal_jabatan').value.trim();
@@ -798,7 +850,8 @@ function simpanModal() {
     } else {
       jabatanData[currentEditIndex] = dataBaru;
     }
-    renderJabatan();
+    // Urutkan berdasarkan TMT
+    sortAndRenderJabatan();
   }
   closeModal();
 }
@@ -817,7 +870,7 @@ function editPangkat(idx) { openModal('pangkat', idx); }
 function hapusPangkat(idx) {
   if (confirm('Hapus riwayat pangkat ini?')) {
     pangkatData.splice(idx, 1);
-    renderPangkat();
+    sortAndRenderPangkat();
   }
 }
 function tambahJabatan() { openModal('jabatan', -1); }
@@ -825,7 +878,7 @@ function editJabatan(idx) { openModal('jabatan', idx); }
 function hapusJabatan(idx) {
   if (confirm('Hapus riwayat jabatan ini?')) {
     jabatanData.splice(idx, 1);
-    renderJabatan();
+    sortAndRenderJabatan();
   }
 }
 
@@ -1091,6 +1144,10 @@ function isiFormDenganData(data) {
   anakData = data.anak && Array.isArray(data.anak) ? data.anak.map(a => [a[0]||'', a[1]||'']) : [];
   pangkatData = data.pangkat_list && Array.isArray(data.pangkat_list) ? data.pangkat_list.map(p => [p[0]||'', p[1]||'', p[2]||'', p[3]||'']) : [];
   jabatanData = data.jabatan_list && Array.isArray(data.jabatan_list) ? data.jabatan_list.map(j => [j[0]||'', j[1]||'', j[2]||'', j[3]||'']) : [];
+  
+  // Urutkan data setelah dimuat
+  pangkatData = sortByTMT(pangkatData);
+  jabatanData = sortByTMT(jabatanData);
   
   renderAnak();
   renderPangkat();
